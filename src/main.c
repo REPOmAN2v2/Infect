@@ -9,7 +9,7 @@
 
 typedef enum _directions {NORTH, WEST, SOUTH, EAST} Directions;
 typedef enum _deltas {NONE, N=-1, W=-1, S=1, E=1} Deltas;
-typedef enum _characters {EMPTY,DEAD, INF, DOC, CIT, SOL} Characters;
+typedef enum _characters {EMPTY,DEAD, INF, DOC, CIT, SOL, NUR} Characters;
 
 typedef struct _board {
 	Characters character;
@@ -30,6 +30,7 @@ void getActionInf(Board *infected, Board *target);
 void getActionDoc(Board *doctor, Board *target);
 void getActionCit(Board *soldier, Board *target);
 void getActionSol(Board *soldier, Board *target);
+void getActionNurse(Board *nurse, Board *target);
 int checkOutBounds(Board board[][X], Directions move, int y, int x);
 
 
@@ -45,6 +46,7 @@ int main (int argc, char **argv)
 	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	init_pair(3, COLOR_BLUE, COLOR_BLACK);
 	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 
 	Board board[Y][X] = {{0}};	
 
@@ -82,6 +84,7 @@ void getMoves(Board board[][X])
 				case DOC:
 				case CIT:
 				case SOL:
+				case NUR:
 					board[i][j].direction = rand()%4;
 					if (checkOutBounds(board, board[i][j].direction, i, j)) {
 						Board *target = getDelta(board, i, j);
@@ -128,6 +131,10 @@ void getActions(Board board[][X])
 						checkTarget(board, i, j, getActionSol);
 					}
 					break;
+				case NUR:
+					if (checkOutBounds(board, board[i][j].direction, i, j)) {
+						checkTarget(board, i, j, getActionNurse);
+					}
 			}
 		}
 	}
@@ -164,11 +171,11 @@ void getActionInf(Board *infected,  Board *target)
 {
 	if (target->character == CIT) {
 		target->character = INF;
-	} else if (target->character == DOC) {
+	} else if (target->character == DOC || target->character == NUR) {
 		int prob = rand()%100;
 	
 		if (prob < 5) {
-			infected->character = DOC;
+			infected->character = NUR;
 		} else if (prob >=5 && prob < 10) {
 			infected->character = CIT;
 		} else if (prob >=10 && prob < 15) {
@@ -183,6 +190,11 @@ void getActionInf(Board *infected,  Board *target)
 		} else {
 			infected->character = DEAD;
 		}
+	} else if (target->character == SOL) {
+		if (rand()%100 < 45) {
+			target->character = DEAD;
+		}
+
 	}		
 }
 
@@ -191,7 +203,7 @@ void getActionDoc(Board *doctor, Board *target)
 	int prob = rand()%100;
 	if (target->character == CIT || target->character == INF) {
 		if (prob < 7) {
-			target->character = DOC;
+			target->character = NUR;
 		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
@@ -224,6 +236,16 @@ void getActionSol(Board *soldier, Board *target)
 	} else if (target->character == CIT) {
 		if (prob >=80) {
 			target->character = SOL;
+		}
+	}
+}
+
+void getActionNurse(Board *nurse, Board *target)
+{
+	int prob = rand()%100;
+	if (target->character == CIT || target->character == INF) {
+		if (prob < 3) {
+			target->character = NUR;
 		}
 	}
 }
@@ -270,6 +292,12 @@ void displayBoard(Board board[][X], int days)
 					attron(COLOR_PAIR(2));
 					mvprintw(i, j, "O");
 					attroff(COLOR_PAIR(2));		
+					break;
+
+				case NUR:
+					attron(COLOR_PAIR(5));
+					mvprintw(i, j, "N");
+					attroff(COLOR_PAIR(5));
 					break;
 
 				case DEAD:
