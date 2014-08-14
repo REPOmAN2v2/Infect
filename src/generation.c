@@ -1,4 +1,59 @@
+#include <string.h>
+#include <ctype.h>
 #include "generation.h"
+
+void parseArgs(int argc, char **argv)
+{
+	if (argc == 1)	return;
+
+	for (size_t i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-x") == 0) {
+			if (i + 1 <= argc - 1) {
+				++i;
+				char *end;
+				int val = strtol(argv[i], &end, 10);
+				if (end != NULL && !end[0] && val >= 0) {
+					X = val;
+					continue;
+				} else {
+					goto error;
+				}
+			}
+		} else if (strcmp(argv[i], "-y") == 0) {
+			if (i + 1 <= argc - 1) {
+				++i;
+				char *end;
+				int val = strtol(argv[i], &end, 10);
+				if (end != NULL && !end[0] && val >= 0) {
+					Y = val;
+					continue;
+				} else {
+					goto error;
+				}
+			}
+		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+			printHelp();
+		}
+	}
+
+	return;
+
+	error:
+		fprintf(stdout, "Unrecognised option(s)\n");
+		printHelp();
+}
+
+void printHelp()
+{
+	//fprintf(stdout, "--map <str>\t\tSpecify a file to read from containing a map\n");
+    fprintf(stdout, "--x <int>\t\tUse in conjunction with --y <int> to specify dimensions of auto-generated map\n");
+    fprintf(stdout, "--y <int>\t\tSee above\n");
+    //fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
+    //fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
+    //fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
+    fprintf(stdout, "Default values are x=100, y=50, fast speed\n");
+    exit(EXIT_FAILURE);
+}
 
 void initialise(Board board[][X])
 {

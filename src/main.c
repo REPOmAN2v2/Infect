@@ -1,4 +1,5 @@
 #include <time.h>
+#include <string.h>
 
 #include "display.h"
 #include "gameplay.h"
@@ -6,6 +7,7 @@
 
 unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
 				countCit = 0, countDea = 0, elapsed = 0;
+unsigned int X = 100, Y = 50;
 const unsigned int localTimeout = 200000;
 
 int main (int argc, char **argv) 
@@ -13,9 +15,11 @@ int main (int argc, char **argv)
 	unsigned int days = 0;
 	srand(time(NULL));
 
+	parseArgs(argc, argv);
 	initNcurses();
 
-	Board board[Y][X] = {{0}};	
+	Board board[Y][X];
+	memset(board, 0, Y*X*sizeof(Board));	
 
 	initialise(board);
 	do {
