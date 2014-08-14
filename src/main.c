@@ -26,10 +26,11 @@ void getActions(Board board[][X]);
 Board * getDelta(Board board[][X], int y, int x);
 void getMoves(Board board[][X]);
 void checkTarget(Board board[][X], int y, int x, action getAction);
+void checkSoldierRadius(Board board[][X], int y, int x);
 void getActionInf(Board *infected, Board *target);
 void getActionDoc(Board *doctor, Board *target);
 void getActionCit(Board *soldier, Board *target);
-void getActionSol(Board *soldier, Board *target);
+void getActionSol(Board board[][X], Board *soldier, Board *target, int x, int y);
 void getActionNurse(Board *nurse, Board *target);
 int checkOutBounds(Board board[][X], Directions move, int y, int x);
 
@@ -52,11 +53,11 @@ int main (int argc, char **argv)
 
 	initialise(board);
 	do {
-		if (!(days%5)) {
+		//if (!(days%5)) {
 			displayBoard(board, days);
 			refresh();
 			sleep(1);
-		}
+		//}
 		getActions(board);
 		getMoves(board);
 		++days;
@@ -127,9 +128,7 @@ void getActions(Board board[][X])
 					}
 					break;
 				case SOL:
-					if (rand()%100 >= 75 && checkOutBounds(board, board[i][j].direction, i, j)) {
-						checkTarget(board, i, j, getActionSol);
-					}
+					checkSoldierRadius(board, i, j);
 					break;
 				case NUR:
 					if (checkOutBounds(board, board[i][j].direction, i, j)) {
@@ -167,6 +166,30 @@ void checkTarget(Board board[][X], int y, int x, action getAction)
 	getAction(&board[y][x], target);
 }
 
+void checkSoldierRadius(Board board[][X], int y, int x)
+{
+	int r1 = rand()%2, r2 = rand()%3;
+	int xt = x, yt = y;
+
+	if (rand()%2) {
+		yt += r1;
+	} else {
+		yt -= r1;
+	}
+
+	if (rand()%2) {
+		xt =+ r2;
+	} else {
+		xt -= r2;
+	}
+
+	if (x >= 0 && x < X && y >=0 && y < Y) {
+		Board *attacker = &board[y][x];
+		Board *target = &board[yt][xt];
+		getActionSol(board, attacker, target, x, y);
+	}
+}
+
 void getActionInf(Board *infected,  Board *target)
 {
 	if (target->character == CIT) {
@@ -176,16 +199,16 @@ void getActionInf(Board *infected,  Board *target)
 	
 		if (prob < 5) {
 			infected->character = NUR;
-		} else if (prob >=5 && prob < 10) {
+		} else if (prob < 10) {
 			infected->character = CIT;
-		} else if (prob >=10 && prob < 15) {
+		} else if (prob < 15) {
 			infected->character = SOL;
-		} else if (prob >= 15 && prob < 25) {
+		} else if (prob < 25) {
 			infected->character = DEAD;
 			target->character = DEAD;
-		} else if (prob >= 25 && prob < 50) {
+		} else if (prob < 50) {
 			target->character = INF;
-		} else if (prob >= 50 && prob < 75) {
+		} else if (prob < 75) {
 			target->character = DEAD;
 		} else {
 			infected->character = DEAD;
@@ -205,6 +228,10 @@ void getActionDoc(Board *doctor, Board *target)
 		if (prob < 7) {
 			target->character = NUR;
 		}
+	} else if (target->character == INF) {
+		if (prob < 17) {
+			target->character = CIT;
+		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
 			target->character = CIT;
@@ -222,20 +249,40 @@ void getActionCit(Board *citizen, Board *target)
 	}
 }
 
-void getActionSol(Board *soldier, Board *target)
+void getActionSol(Board board[][X], Board *soldier, Board *target, int x, int y)
 {
 	int prob = rand()%100;
-	if (target->character == DOC) {
-		if (prob == 11) {
-			target->character = DEAD;
+	if (prob < 2 && (target->character == DOC || target->character == NUR)) {
+		prob = rand()%100;
+	} 
+
+	if (prob < 25) {
+
+		int shoot = 0;
+		for (int i = y - 2; i < y + 3; i++) {
+			for (int j = x - 3; j < x + 4; j++) {
+				if (j >= 0 && j < X && i >=0 && i < Y) {
+					if (board[i][j].character == CIT) {
+						shoot = 1;
+					}
+				}
+			}
 		}
-	} else if (target->character == INF) {
-		target->character = DEAD;
-	} else if (target->character == DEAD) {
-		target->character = EMPTY;
-	} else if (target->character == CIT) {
-		if (prob >=80) {
-			target->character = SOL;
+
+		if (shoot) {
+			if (target->character == INF) {
+				target->character = DEAD;
+			} else if (prob < 2 && (target->character == NUR || target->character == SOL)) {
+				target->character = DEAD;
+			}
+		}
+
+		if (target->character == CIT) {
+			if (prob < 20) {
+				target->character = SOL;
+			}
+		} else if (target->character == DEAD) {
+			target->character = EMPTY;
 		}
 	}
 }
@@ -243,9 +290,11 @@ void getActionSol(Board *soldier, Board *target)
 void getActionNurse(Board *nurse, Board *target)
 {
 	int prob = rand()%100;
-	if (target->character == CIT || target->character == INF) {
+	if (target->character == INF) {
 		if (prob < 3) {
 			target->character = NUR;
+		} else if (prob < 17) {
+			target->character = CIT;
 		}
 	}
 }
@@ -304,7 +353,7 @@ void displayBoard(Board board[][X], int days)
 					mvprintw(i, j, "X");
 					break;
 				
-				default:
+				case EMPTY:
 					mvprintw(i, j, " ");
 					break;
 			}
