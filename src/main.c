@@ -18,10 +18,14 @@ typedef struct _board {
 
 typedef void (*action)(Board*, Board*);
 
+unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
+				countCit = 0, countDea = 0, elapsed = 0;
+const unsigned int localTimeout = 200000;
+
 void generateCoord(Board board[][X], const int count, Characters type);
 void initialise(Board board[][X]);
 void defaultBoard(Board board[][X]);
-void displayBoard(Board board[][X], int days);
+int displayBoard(Board board[][X], int days);
 void getActions(Board board[][X]);
 Board * getDelta(Board board[][X], int y, int x);
 void getMoves(Board board[][X]);
@@ -33,7 +37,8 @@ void getActionCit(Board *soldier, Board *target);
 void getActionSol(Board board[][X], Board *soldier, Board *target, int x, int y);
 void getActionNurse(Board *nurse, Board *target);
 int checkOutBounds(Board board[][X], Directions move, int y, int x);
-
+void checkWin(Board board[][X], unsigned int days);
+void win(Board board[][X], int outcome, unsigned int days);
 
 int main (int argc, char **argv) 
 {
@@ -53,27 +58,27 @@ int main (int argc, char **argv)
 
 	initialise(board);
 	do {
-		//if (!(days%5)) {
+		if (!(days%5)) {
 			displayBoard(board, days);
 			refresh();
 			sleep(1);
-		//}
+		}
+		checkWin(board, days);
 		getActions(board);
 		getMoves(board);
 		++days;
-	} while (days < 1000);	
-	
-	endwin();
+	} while (1);	
 }
 
 void initialise(Board board[][X])
 {
-	const int countS = 1, countI = 3, countD = 10;
+	countDoc = 10, countSol = 1, countInf = 3;
+	countCit = X*Y - countDoc - countSol - countInf;
 
 	defaultBoard(board);	
-	generateCoord(board, countS, SOL);
-	generateCoord(board, countI, INF);
-	generateCoord(board, countD, DOC);
+	generateCoord(board, countSol, SOL);
+	generateCoord(board, countInf, INF);
+	generateCoord(board, countDoc, DOC);
 }
 
 void getMoves(Board board[][X])
@@ -107,6 +112,7 @@ void getActions(Board board[][X])
 {
 	for (size_t i = 0; i < Y; i++) {
 		for (size_t j = 0; j < X; j++) {
+			++elapsed;
 			board[i][j].direction = rand()%4; 
 			switch (board[i][j].character) {
 				case DEAD: //fallthrough
@@ -194,28 +200,48 @@ void getActionInf(Board *infected,  Board *target)
 {
 	if (target->character == CIT) {
 		target->character = INF;
+		elapsed = 0;
+		--countCit;
+		++countInf;
 	} else if (target->character == DOC || target->character == NUR) {
 		int prob = rand()%100;
 	
 		if (prob < 5) {
 			infected->character = NUR;
+			--countInf;
+			++countNur;
 		} else if (prob < 10) {
 			infected->character = CIT;
+			--countInf;
+			++countCit;
 		} else if (prob < 15) {
 			infected->character = SOL;
+			--countInf;
+			++countSol;
 		} else if (prob < 25) {
+			--countInf;
+			if (target->character == DOC) --countDoc;
+			else --countNur;
 			infected->character = DEAD;
 			target->character = DEAD;
 		} else if (prob < 50) {
 			target->character = INF;
+			++countInf;
 		} else if (prob < 75) {
+			if (target->character == DOC) --countDoc;
+			else --countNur;
 			target->character = DEAD;
 		} else {
 			infected->character = DEAD;
+			--countInf;
 		}
+
+		elapsed = 0;
+
 	} else if (target->character == SOL) {
 		if (rand()%100 < 45) {
 			target->character = DEAD;
+			--countSol;
 		}
 
 	}		
@@ -226,15 +252,25 @@ void getActionDoc(Board *doctor, Board *target)
 	int prob = rand()%100;
 	if (target->character == CIT || target->character == INF) {
 		if (prob < 7) {
+			++countNur;
+			if (target->character == CIT) --countCit;
+			else --countInf;
 			target->character = NUR;
+			elapsed = 0;
 		}
 	} else if (target->character == INF) {
 		if (prob < 17) {
 			target->character = CIT;
+			++countCit;
+			--countInf;
+			elapsed = 0;
 		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
 			target->character = CIT;
+			++countCit;
+			--countDea;
+			elapsed = 0;
 		}
 	}
 }
@@ -244,8 +280,14 @@ void getActionCit(Board *citizen, Board *target)
 	int prob = rand()%100;
 	if (prob == 10) {
 		citizen->character = DOC;
+		--countCit;
+		++countDoc;
+		elapsed = 0;
 	} else if (prob == 23) {
 		citizen->character = INF;
+		--countCit;
+		++countDoc;
+		elapsed = 0;
 	}
 }
 
@@ -272,17 +314,28 @@ void getActionSol(Board board[][X], Board *soldier, Board *target, int x, int y)
 		if (shoot) {
 			if (target->character == INF) {
 				target->character = DEAD;
+				++countDea;
+				--countInf;
+				elapsed = 0;
 			} else if (prob < 2 && (target->character == NUR || target->character == SOL)) {
+				if (target->character == NUR) --countNur;
+				else --countSol;
+				++countDea;
 				target->character = DEAD;
+				elapsed = 0;
 			}
 		}
 
 		if (target->character == CIT) {
 			if (prob < 20) {
 				target->character = SOL;
+				--countCit;
+				++countSol;
+				elapsed = 0;
 			}
 		} else if (target->character == DEAD) {
 			target->character = EMPTY;
+			--countDea;
 		}
 	}
 }
@@ -293,8 +346,12 @@ void getActionNurse(Board *nurse, Board *target)
 	if (target->character == INF) {
 		if (prob < 3) {
 			target->character = NUR;
+			--countInf;
+			++countNur;
 		} else if (prob < 17) {
 			target->character = CIT;
+			--countInf;
+			++countCit;
 		}
 	}
 }
@@ -312,7 +369,7 @@ int checkOutBounds(Board board[][X], Directions move, int y, int x)
 	}
 }
 
-void displayBoard(Board board[][X], int days) 
+int displayBoard(Board board[][X], int days) 
 {
 	size_t i;
 	
@@ -360,6 +417,8 @@ void displayBoard(Board board[][X], int days)
 		}
 	}
 	mvprintw(i, 0, "Day %d", days);
+
+	return i;
 }	
 
 void defaultBoard(Board board[][X])
@@ -385,4 +444,36 @@ void generateCoord(Board board[][X], const int count, Characters type)
 		board[y][x].character = type;
 	} 
 }
+
+void checkWin(Board board[][X], unsigned int days) 
+{
+	if (countInf >= X*Y*0.8) {
+		win(board, 0, days);
+	}
+	if (elapsed >= localTimeout || !countInf) {
+		win(board, 1, days);
+	}
+}
 	
+void win(Board board[][X], int outcome, unsigned int days)
+{
+	int pos = displayBoard(board, days);
+
+	if (outcome == 1) {
+		if (!countInf) {
+			mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
+		} else {
+			mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
+		}
+	} else {
+		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", days);
+	}
+
+	mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", countDoc, countInf, 
+		countCit, countNur, countSol, countDea, days);
+
+	refresh();
+	while(1);
+	endwin();
+	exit(EXIT_SUCCESS);
+}
