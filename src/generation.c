@@ -7,52 +7,65 @@ unsigned int X = 79, Y = 20;
 Board ** parseArgs(int argc, char **argv)
 {
 	Board **board = NULL;
-	countDoc = 10, countSol = 1, countInf = 3;
+	int map = 0, size = 0, bDoctor = 0, bInfected = 0, bSoldier = 0,
+	bNurse = 0;
 
-	if (argc == 1)	return initDefault();
-
-	int map = 0, size = 0;
-
-	for (size_t i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-x") == 0) {
-			checkArg(i, argc, argv, &size, map, &X);
-		} else if (strcmp(argv[i], "-y") == 0) {
-			checkArg(i, argc, argv, &size, map, &Y);
-		} else if (strcmp(argv[i], "-d") == 0) {
-			checkArg(i, argc, argv, &size, map, &countDoc);
-		} else if (strcmp(argv[i], "-i") == 0) {
-			checkArg(i, argc, argv, &size, map, &countInf);
-		} else if (strcmp(argv[i], "-s") == 0) {
-			checkArg(i, argc, argv, &size, map, &countSol);
-		} else if (strcmp(argv[i], "-n") == 0) {
-			checkArg(i, argc, argv, &size, map, &countNur);
-		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
-			printHelp();
-		} else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
-			if (i + 1 <= argc - 1) {
-				if (!size) {
-					++i;
-					board = getMap(argv[i]);
-					map = 1;
-				} else {
-					printError("Conflict between -m and -x/-y/-d/-i/-s/-n\n");
+	if (argc > 1) {
+		for (size_t i = 1; i < argc; i++) {
+			if (strcmp(argv[i], "-x") == 0) {
+				checkArg(i, argc, argv, &size, map, &X);
+			} else if (strcmp(argv[i], "-y") == 0) {
+				checkArg(i, argc, argv, &size, map, &Y);
+			} else if (strcmp(argv[i], "-d") == 0) {
+				checkArg(i, argc, argv, &bDoctor, map, &countDoc);
+			} else if (strcmp(argv[i], "-i") == 0) {
+				checkArg(i, argc, argv, &bInfected, map, &countInf);
+			} else if (strcmp(argv[i], "-s") == 0) {
+				checkArg(i, argc, argv, &bSoldier, map, &countSol);
+			} else if (strcmp(argv[i], "-n") == 0) {
+				checkArg(i, argc, argv, &bNurse, map, &countNur);
+			} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+				printHelp();
+			} else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
+				if (i + 1 <= argc - 1) {
+					if (!size && !bDoctor && !bInfected && !bSoldier && !bNurse) {
+						++i;
+						board = getMap(argv[i]);
+						map = 1;
+					} else {
+						printError("Conflict between -m and -x/-y/-d/-i/-s/-n\n");
+					}
 				}
-			}
-		} else if (strcmp(argv[i], "--slow") == 0) {
-			refreshRate = 10;
-		} else if (strcmp(argv[i], "--fast") == 0) {
-        	refreshRate = 5;
-        } else if (strcmp(argv[i], "--fastest") == 0) {
-        	refreshRate = 1;
-        }
+			} else if (strcmp(argv[i], "--slow") == 0) {
+				refreshRate = 10;
+			} else if (strcmp(argv[i], "--fast") == 0) {
+	        	refreshRate = 5;
+	        } else if (strcmp(argv[i], "--fastest") == 0) {
+	        	refreshRate = 1;
+	        }
+		}
 	}
 
-	if (!map) { board = initDefault(); }
+	if (!map) {
+		if (!bDoctor) {
+			countDoc = (X*Y*0.01)+1;
+		}
+		if (!bInfected) {
+			countInf = (X*Y*0.01)+1;
+		}
+		if (!bSoldier) {
+			countSol = (X*Y*0.02)+1;
+		}
+		if (!bNurse) {
+			countNur = (X*Y*0.05)+1;
+		}
+		board = initDefault(); 
+	}
 
 	return board;
 }
 
-int checkArg(int i, int argc, char **argv, int *size, int map, unsigned int *constant)
+int checkArg(int i, int argc, char **argv, int *check, int map, unsigned int *constant)
 {
 	if (i + 1 <= argc - 1) {
 		if (!map) {
@@ -61,7 +74,7 @@ int checkArg(int i, int argc, char **argv, int *size, int map, unsigned int *con
 			int val = strtol(argv[i], &end, 10);
 			if (end != NULL && !end[0] && val >= 0) {
 				*constant = val;
-				*size = 1;
+				*check = 1;
 				return 1;
 			} else {
 				printError("Unrecognised option(s)\n");
@@ -87,7 +100,7 @@ void printHelp()
     fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
     fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
     fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
-    fprintf(stdout, "Default values are x=79, y=20, fast speed, 10 doctors, 3 infected, 1 soldier.\n");
+    fprintf(stdout, "Default values are x=79, y=20, fast speed, 16 doctors, 16 infected, 32 soldiers, 80 nurses.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -196,6 +209,7 @@ Board **initDefault()
 	generateCoord(board, countSol, SOL);
 	generateCoord(board, countInf, INF);
 	generateCoord(board, countDoc, DOC);
+	generateCoord(board, countNur, NUR);
 
 	return board;
 }
