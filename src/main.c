@@ -57,9 +57,10 @@ void win(Board **board, int outcome, unsigned int days)
 
 	mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", countDoc, countInf, 
 		countCit, countNur, countSol, countDea, days);
+	mvprintw(++pos, 0, "Press q to quit\n");
 
 	refresh();
-	while(1);
+	while(getch() != 'q');
 	endwin();
 	for(size_t i = 0; i < Y; i++)
 		free(board[i]);

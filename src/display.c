@@ -4,6 +4,7 @@ void initNcurses()
 {
 	initscr();
 	noecho();
+	cbreak();
 	start_color();
 
 	init_pair(1, COLOR_RED, COLOR_BLACK);
