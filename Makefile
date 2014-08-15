@@ -4,7 +4,7 @@ SRC=./src
 
 CC = gcc
 LDFLAGS = -lncurses
-CFLAGS := -Wall -Og -std=c11
+CFLAGS := -Wall -g -std=c11
 
 _HEADERS := display.h generation.h gameplay.h
 _OBJECTS := $(_HEADERS:.h=.o)

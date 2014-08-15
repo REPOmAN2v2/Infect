@@ -108,7 +108,7 @@ void checkSoldierRadius(Board **board, int y, int x)
 		xt -= r2;
 	}
 
-	if (x >= 0 && x < X && y >=0 && y < Y) {
+	if (xt >= 0 && xt < X && yt >=0 && yt < Y) {
 		Board *attacker = &board[y][x];
 		Board *target = &board[yt][xt];
 		getActionSol(board, attacker, target, x, y);
