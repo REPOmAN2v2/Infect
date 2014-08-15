@@ -61,7 +61,9 @@ int displayBoard(Board **board, int days)
 			}
 		}
 	}
-	mvprintw(i, 0, "Day %d", days);
+	mvprintw(i, 0, "Day %u", days);
+	mvprintw(++i, 0, "Citizens: %u, Infected: %u, Doctors: %u, Nurses: %u, Soldiers: %u, Dead: %u", 
+		countCit, countInf, countDoc, countNur, countSol, countDea);
 
 	return i;
 }	

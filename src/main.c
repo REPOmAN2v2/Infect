@@ -55,8 +55,8 @@ void win(Board **board, int outcome, unsigned int days)
 		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", days);
 	}
 
-	mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", countDoc, countInf, 
-		countCit, countNur, countSol, countDea, days);
+	//mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", 
+	//countDoc, countInf, countCit, countNur, countSol, countDea, days);
 	mvprintw(++pos, 0, "Press q to quit\n");
 
 	refresh();

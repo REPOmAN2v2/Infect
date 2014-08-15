@@ -141,6 +141,8 @@ void getActionInf(Board *infected,  Board *target)
 			--countInf;
 			if (target->character == DOC) --countDoc;
 			else --countNur;
+			countDea += 2;
+
 			infected->character = DEAD;
 			target->character = DEAD;
 		} else if (prob < 50) {
@@ -149,10 +151,13 @@ void getActionInf(Board *infected,  Board *target)
 		} else if (prob < 75) {
 			if (target->character == DOC) --countDoc;
 			else --countNur;
+			++countDea;
+
 			target->character = DEAD;
 		} else {
 			infected->character = DEAD;
 			--countInf;
+			++countDea;
 		}
 
 		elapsed = 0;
@@ -161,6 +166,7 @@ void getActionInf(Board *infected,  Board *target)
 		if (rand()%100 < 45) {
 			target->character = DEAD;
 			--countSol;
+			++countDea;
 		}
 
 	}		
@@ -219,12 +225,12 @@ void getActionSol(Board **board, Board *soldier, Board *target, int x, int y)
 
 	if (prob < 25) {
 
-		int shoot = 0;
+		int shoot = 1;
 		for (int i = y - 2; i < y + 3; i++) {
 			for (int j = x - 3; j < x + 4; j++) {
 				if (j >= 0 && j < X && i >=0 && i < Y) {
 					if (board[i][j].character == CIT) {
-						shoot = 1;
+						shoot = 0;
 					}
 				}
 			}
