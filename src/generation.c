@@ -107,7 +107,7 @@ Board ** getMap(const char* path)
 	}
 
 	if ((read = getline(&line, &len, map)) != -1) {
-		X = read;
+		X = read - 1;	// Remove \n
 		fseek(map, 0L, SEEK_END);
 		Y = ftell(map)/read;
 		rewind(map);
