@@ -16,11 +16,11 @@ typedef struct _board {
 } Board;
 
 extern unsigned int 	countDoc, countInf, countNur, countSol, 
-				countCit, countDea, elapsed;
+				countCit, countDea, elapsed, total;
 extern const unsigned int localTimeout;
 extern unsigned int X, Y;
 
-void checkWin(Board board[][X], unsigned int);
-void win(Board board[][X], int, unsigned int);
+void checkWin(Board **board, unsigned int);
+void win(Board **board, int, unsigned int);
 
 #endif

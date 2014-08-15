@@ -1,6 +1,6 @@
 #include "gameplay.h"
 
-void getMoves(Board board[][X])
+void getMoves(Board **board)
 {
 	for (size_t i = 0; i < Y; i++) {
 		for (size_t j = 0; j < X; j++) {
@@ -27,7 +27,7 @@ void getMoves(Board board[][X])
 	}
 }
 
-void getActions(Board board[][X]) 
+void getActions(Board **board) 
 {
 	for (size_t i = 0; i < Y; i++) {
 		for (size_t j = 0; j < X; j++) {
@@ -64,7 +64,7 @@ void getActions(Board board[][X])
 	}
 }
 
-Board * getDelta(Board board[][X], int y, int x)
+Board * getDelta(Board **board, int y, int x)
 {
 	Board *attacker = &board[y][x];
 	Board *target = malloc(sizeof(Board));	
@@ -80,7 +80,7 @@ Board * getDelta(Board board[][X], int y, int x)
 
 } 
 
-void checkTarget(Board board[][X], int y, int x, action getAction)
+void checkTarget(Board **board, int y, int x, action getAction)
 {
 	Board *target = NULL;
 	
@@ -91,7 +91,7 @@ void checkTarget(Board board[][X], int y, int x, action getAction)
 	getAction(&board[y][x], target);
 }
 
-void checkSoldierRadius(Board board[][X], int y, int x)
+void checkSoldierRadius(Board **board, int y, int x)
 {
 	int r1 = rand()%2, r2 = rand()%3;
 	int xt = x, yt = y;
@@ -210,7 +210,7 @@ void getActionCit(Board *citizen, Board *target)
 	}
 }
 
-void getActionSol(Board board[][X], Board *soldier, Board *target, int x, int y)
+void getActionSol(Board **board, Board *soldier, Board *target, int x, int y)
 {
 	int prob = rand()%100;
 	if (prob < 2 && (target->character == DOC || target->character == NUR)) {
@@ -275,7 +275,7 @@ void getActionNurse(Board *nurse, Board *target)
 	}
 }
 
-int checkOutBounds(Board board[][X], Directions move, int y, int x)
+int checkOutBounds(Board **board, Directions move, int y, int x)
 {
 	if (move == NORTH) {		
 		return (y + N >= 0);

@@ -6,8 +6,7 @@
 #include "generation.h"
 
 unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
-				countCit = 0, countDea = 0, elapsed = 0;
-unsigned int X = 100, Y = 50;
+				countCit = 0, countDea = 0, elapsed = 0, total = 0;
 const unsigned int localTimeout = 200000;
 
 int main (int argc, char **argv) 
@@ -15,13 +14,9 @@ int main (int argc, char **argv)
 	unsigned int days = 0;
 	srand(time(NULL));
 
-	parseArgs(argc, argv);
+	Board **board = parseArgs(argc, argv);
 	initNcurses();
 
-	Board board[Y][X];
-	memset(board, 0, Y*X*sizeof(Board));	
-
-	initialise(board);
 	do {
 		if (!(days%5)) {
 			displayBoard(board, days);
@@ -35,9 +30,9 @@ int main (int argc, char **argv)
 	} while (1);	
 }
 
-void checkWin(Board board[][X], unsigned int days) 
+void checkWin(Board **board, unsigned int days) 
 {
-	if (countInf >= X*Y*0.8) {
+	if (countInf >= total*0.8) {
 		win(board, 0, days);
 	}
 	if (elapsed >= localTimeout || !countInf) {
@@ -45,7 +40,7 @@ void checkWin(Board board[][X], unsigned int days)
 	}
 }
 	
-void win(Board board[][X], int outcome, unsigned int days)
+void win(Board **board, int outcome, unsigned int days)
 {
 	int pos = displayBoard(board, days);
 
@@ -65,5 +60,9 @@ void win(Board board[][X], int outcome, unsigned int days)
 	refresh();
 	while(1);
 	endwin();
+	for(size_t i = 0; i < Y; i++)
+		free(board[i]);
+	free(board);
+
 	exit(EXIT_SUCCESS);
 }

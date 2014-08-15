@@ -3,10 +3,13 @@
 
 #include "include.h"
 
-void parseArgs(int argc, char **argv);
+Board ** parseArgs(int, char **);
 void printHelp();
-void generateCoord(Board board[][X], const int, Characters);
-void initialise(Board board[][X]);
-void defaultBoard(Board board[][X]);
+Board ** getMap(const char*);
+Board ** initBoard();
+void fillBoard(Board **, int, const char*);
+Board **initDefault();
+void defaultBoard(Board **);
+void generateCoord(Board **, const int, Characters);
 
 #endif

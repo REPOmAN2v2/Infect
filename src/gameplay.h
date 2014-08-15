@@ -5,16 +5,16 @@
 
 typedef void (*action)(Board*, Board*);
 
-void getMoves(Board board[][X]);
-void getActions(Board board[][X]);
-Board * getDelta(Board board[][X], int, int);
-void checkTarget(Board board[][X], int, int, action);
-void checkSoldierRadius(Board board[][X], int, int);
+void getMoves(Board **);
+void getActions(Board **);
+Board * getDelta(Board **, int, int);
+void checkTarget(Board **, int, int, action);
+void checkSoldierRadius(Board **, int, int);
 void getActionInf(Board *, Board *);
 void getActionDoc(Board *, Board *);
 void getActionCit(Board *, Board *);
-void getActionSol(Board board[][X], Board *, Board *, int, int);
+void getActionSol(Board **, Board *, Board *, int, int);
 void getActionNurse(Board *, Board *);
-int checkOutBounds(Board board[][X], Directions, int, int);
+int checkOutBounds(Board **, Directions, int, int);
 
 #endif
