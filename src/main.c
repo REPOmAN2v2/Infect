@@ -8,6 +8,7 @@
 unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
 				countCit = 0, countDea = 0, elapsed = 0, total = 0;
 const unsigned int localTimeout = 200000;
+unsigned int refreshRate = 5;
 
 int main (int argc, char **argv) 
 {
@@ -18,7 +19,7 @@ int main (int argc, char **argv)
 	initNcurses();
 
 	do {
-		if (!(days%5)) {
+		if (!(days % refreshRate)) {
 			displayBoard(board, days);
 			refresh();
 			sleep(1);

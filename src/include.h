@@ -18,7 +18,7 @@ typedef struct _board {
 extern unsigned int 	countDoc, countInf, countNur, countSol, 
 				countCit, countDea, elapsed, total;
 extern const unsigned int localTimeout;
-extern unsigned int X, Y;
+extern unsigned int X, Y, refreshRate;
 
 void checkWin(Board **board, unsigned int);
 void win(Board **board, int, unsigned int);

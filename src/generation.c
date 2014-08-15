@@ -59,7 +59,13 @@ Board ** parseArgs(int argc, char **argv)
 					goto conflict;
 				}
 			}
-		}
+		} else if (strcmp(argv[i], "--slow") == 0) {
+			refreshRate = 10;
+		} else if (strcmp(argv[i], "--fast") == 0) {
+        	refreshRate = 5;
+        } else if (strcmp(argv[i], "--fastest") == 0) {
+        	refreshRate = 1;
+        }
 	}
 
 	if (!map) { board = initDefault(); }
@@ -77,12 +83,12 @@ Board ** parseArgs(int argc, char **argv)
 
 void printHelp()
 {
-	//fprintf(stdout, "--map <str>\t\tSpecify a file to read from containing a map\n");
+	fprintf(stdout, "--map <str>\t\tSpecify a file to read from containing a map\n");
     fprintf(stdout, "--x <int>\t\tUse in conjunction with --y <int> to specify dimensions of auto-generated map\n");
     fprintf(stdout, "--y <int>\t\tSee above\n");
-    //fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
-    //fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
-    //fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
+    fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
+    fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
+    fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
     fprintf(stdout, "Default values are x=79, y=20, fast speed\n");
     exit(EXIT_FAILURE);
 }
