@@ -36,11 +36,14 @@ int main (int argc, char **argv)
 
 void checkWin(Board **board, unsigned int days) 
 {
-	if (countInf >= total*0.8) {
+	if (countInf >= (countCit + countNur + countDoc + countSol)*4) {
 		win(board, 0, days);
-	}
-	if (elapsed >= localTimeout || !countInf) {
+	} else if (countSol >= (countCit + countNur + countDoc)*1.5 && countSol >= countInf) {
+		win(board, 3, days);
+	} else if (elapsed >= localTimeout) {
 		win(board, 1, days);
+	} else if (!countInf) {
+		win(board, 2, days);
 	}
 }
 	
@@ -48,12 +51,12 @@ void win(Board **board, int outcome, unsigned int days)
 {
 	int pos = displayBoard(board, days);
 
-	if (outcome == 1) {
-		if (!countInf) {
-			mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
-		} else {
-			mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
-		}
+	if (outcome == 2) {
+		mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
+	} else if (outcome == 1) {
+		mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
+	} else if (outcome == 3) {
+		mvprintw(++pos, 0, "It only took %u days for a military dictatorship to be established\n", days);
 	} else {
 		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", days);
 	}

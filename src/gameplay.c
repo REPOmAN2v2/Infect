@@ -263,7 +263,7 @@ void getActionSol(Board **board, Board *soldier, Board *target, int x, int y)
 		}
 
 		if (target->character == CIT) {
-			if (prob >= 90) {
+			if (prob >= 80) {
 				--countCit;
 				++countSol;
 
