@@ -236,6 +236,12 @@ void getActionCit(Board *citizen, Board *target)
 		++countSol;
 
 		citizen->character = SOL;
+	} else if (prob < 15) {
+		if (target->character == EMPTY && days >= 100 && countWood >= 25) {
+			target->character = WALL;
+			countWood -= (rand()%25)+1;
+			elapsed = 0;
+		}
 	}
 }
 

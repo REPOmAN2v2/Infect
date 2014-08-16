@@ -16,12 +16,12 @@ typedef struct _board {
 } Board;
 
 extern unsigned int countDoc, countInf, countNur, countSol, 
-				countCit, countDea, elapsed, total;
+				countCit, countDea, elapsed, total, countWood;
 extern const unsigned int localTimeout;
-extern unsigned int X, Y, refreshRate;
+extern unsigned int X, Y, refreshRate, days;
 extern int stepthrough;
 
-void checkWin(Board **board, unsigned int);
-void win(Board **board, int, unsigned int);
+void checkWin(Board **board);
+void win(Board **board, int);
 
 #endif

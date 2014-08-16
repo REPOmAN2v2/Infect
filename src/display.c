@@ -15,7 +15,7 @@ void initNcurses()
 	init_pair(6, COLOR_CYAN, COLOR_GREEN);
 }
 
-int displayBoard(Board **board, int days) 
+int displayBoard(Board **board) 
 {
 	size_t i;
 	

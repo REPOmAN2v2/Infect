@@ -9,7 +9,7 @@ Board ** parseArgs(int argc, char **argv)
 {
 	Board **board = NULL;
 	int map = 0, size = 0, bDoctor = 0, bInfected = 0, bSoldier = 0,
-	bNurse = 0;
+	bNurse = 0, bWood = 0;
 
 	if (argc > 1) {
 		for (size_t i = 1; i < argc; i++) {
@@ -25,6 +25,8 @@ Board ** parseArgs(int argc, char **argv)
 				checkArg(i, argc, argv, &bSoldier, map, &countSol);
 			} else if (strcmp(argv[i], "-n") == 0) {
 				checkArg(i, argc, argv, &bNurse, map, &countNur);
+			} else if (strcmp(argv[i], "-w") == 0) {
+				checkArg(i, argc, argv, &bWood, map, &countWood);
 			} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 				printHelp();
 			} else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
@@ -61,6 +63,9 @@ Board ** parseArgs(int argc, char **argv)
 		}
 		if (!bNurse) {
 			countNur = (X*Y*0.05)+1;
+		}
+		if (!bWood) {
+			countWood = (X*Y*0.5);
 		}
 		board = initDefault(); 
 	}
@@ -99,7 +104,7 @@ void printHelp()
 	fprintf(stdout, "--map/-m <str>\t\tSpecify a file to read from containing a map, incompatible with -x/-y\n");
     fprintf(stdout, "-x <int>\t\tUse in conjunction with --y <int> to specify dimensions of auto-generated map\n");
     fprintf(stdout, "-y <int>\t\tSee above\n");
-    fprintf(stdout, "-d/-i/-s/-n <int>\tSpecify the number of doctors/infected/soldiers/nurses.\n");
+    fprintf(stdout, "-d/-i/-s/-n/-w <int>\tSpecify the number of doctors/infected/soldiers/nurses/wood.\n");
     fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
     fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
     fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
