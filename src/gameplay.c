@@ -19,7 +19,8 @@ void getMoves(Board **board)
 						}
 					}
 					break;
-				case DEAD:
+				case DEAD:	//fallthrough
+				case WALL:
 				case EMPTY:
 					break;
 			}
@@ -34,6 +35,7 @@ void getActions(Board **board)
 			++elapsed;
 			board[i][j].direction = rand()%4; 
 			switch (board[i][j].character) {
+				case WALL:	//fallthrough
 				case EMPTY:
 					break;
 				case DEAD:

@@ -194,6 +194,9 @@ void fillBoard(Board **board, int y, const char* line)
 				++countNur;
 				++total;
 				break;
+			case 'W':
+				board[y][i].character = WALL;
+				break;
 			default :
 				board[y][i].character = EMPTY;
 				break;

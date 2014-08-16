@@ -12,6 +12,7 @@ void initNcurses()
 	init_pair(3, COLOR_BLUE, COLOR_BLACK);
 	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(6, COLOR_CYAN, COLOR_GREEN);
 }
 
 int displayBoard(Board **board, int days) 
@@ -49,6 +50,12 @@ int displayBoard(Board **board, int days)
 					attron(COLOR_PAIR(5));
 					mvprintw(i, j, "N");
 					attroff(COLOR_PAIR(5));
+					break;
+
+				case WALL:
+					attron(COLOR_PAIR(6));
+					mvprintw(i, j, "W");
+					attroff(COLOR_PAIR(6));
 					break;
 
 				case DEAD:
