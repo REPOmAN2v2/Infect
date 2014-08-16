@@ -108,7 +108,7 @@ void printHelp()
     fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
     fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
     fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
-    fprintf(stdout, "Default values are x=79, y=20, fast speed, 16 doctors, 16 infected, 32 soldiers, 80 nurses.\n");
+    fprintf(stdout, "Default values are x=79, y=20, fast speed, 16 doctors, 16 infected, 32 soldiers, 80 nurses and 790 wood. They scale with x and y.\n");
     exit(EXIT_FAILURE);
 }
 
