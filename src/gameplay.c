@@ -134,6 +134,9 @@ void getActionInf(Board *infected,  Board *target)
 
 			target->character = INF;
 			elapsed = 0;
+		} else if (target->character == WALL && prob < 5) {
+			target->character = EMPTY;
+			countWood += (rand()%25)+1;
 		} else if (target->character == DOC || target->character == NUR) {
 			if (prob < 25) {
 				if (target->character == DOC) --countDoc;
