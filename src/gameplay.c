@@ -34,12 +34,18 @@ void getActions(Board **board)
 			++elapsed;
 			board[i][j].direction = rand()%4; 
 			switch (board[i][j].character) {
-				case DEAD: //fallthrough
 				case EMPTY:
 					break;
+				case DEAD:
+					if (rand()%100 == 1) {
+						board[i][j].character = EMPTY;
+						--countDea;
+					}
 				case INF:
-					if (rand()%100 >= 75 && checkOutBounds(board, board[i][j].direction, i, j)) { 
-						checkTarget(board, i, j, getActionInf);
+					for (board[i][j].direction = 0; board[i][j].direction < 4; board[i][j].direction++) {
+						if (checkOutBounds(board, board[i][j].direction, i, j)) { 
+							checkTarget(board, i, j, getActionInf);
+						}
 					}
 					break;
 				case DOC:
@@ -117,104 +123,117 @@ void checkSoldierRadius(Board **board, int y, int x)
 
 void getActionInf(Board *infected,  Board *target)
 {
-	if (target->character == CIT) {
-		target->character = INF;
-		elapsed = 0;
-		--countCit;
-		++countInf;
-	} else if (target->character == DOC || target->character == NUR) {
-		int prob = rand()%100;
-	
-		if (prob < 5) {
-			infected->character = NUR;
-			--countInf;
-			++countNur;
-		} else if (prob < 10) {
-			infected->character = CIT;
-			--countInf;
-			++countCit;
-		} else if (prob < 15) {
-			infected->character = SOL;
-			--countInf;
-			++countSol;
-		} else if (prob < 25) {
-			--countInf;
-			if (target->character == DOC) --countDoc;
-			else --countNur;
-			countDea += 2;
+	int prob = rand()%100;
 
-			infected->character = DEAD;
-			target->character = DEAD;
-		} else if (prob < 50) {
-			if (target->character == DOC) --countDoc;
-			else --countNur;
-			target->character = INF;
+	if (rand()%100 >= 95) {
+		if (target->character == CIT) {
+			--countCit;
 			++countInf;
-		} else if (prob < 75) {
-			if (target->character == DOC) --countDoc;
-			else --countNur;
-			++countDea;
 
-			target->character = DEAD;
-		} else {
-			infected->character = DEAD;
-			--countInf;
-			++countDea;
+			target->character = INF;
+			elapsed = 0;
+		} else if (target->character == DOC || target->character == NUR) {
+			if (prob < 25) {
+				if (target->character == DOC) --countDoc;
+				else --countNur;
+				++countDea;
+
+				target->character = DEAD;
+			} else if (prob < 30) {
+				--countInf;
+				++countDea;
+
+				infected->character = DEAD;
+			} else if (prob < 60) {
+				if (target->character == DOC) --countDoc;
+				else --countNur;
+				++countInf;
+
+				target->character = INF;
+			} else if (prob < 70) {
+				--countInf;
+				++countCit;
+
+				infected->character = CIT;
+			} else if (prob < 100) {
+				if (target->character == DOC) --countDoc;
+				else --countNur;
+				--countInf;
+				countDea += 2;
+
+				infected->character = DEAD;
+				target->character = DEAD;
+			}
+		} else if (target->character == SOL) {
+			if (prob < 10) {
+				--countInf;
+				++countDea;
+
+				infected->character = DEAD;
+			} else if (prob < 60) {
+				--countSol;
+				++countDea;
+
+				target->character = INF;
+				infected->character = DEAD;
+			} else if (prob < 90) {
+				--countSol;
+				++countInf;
+
+				target->character = INF;
+			} else {
+				--countSol;
+				++countDea;
+
+				target->character = DEAD;
+			}
 		}
-
 		elapsed = 0;
-
-	} else if (target->character == SOL) {
-		if (rand()%100 < 45) {
-			target->character = DEAD;
-			--countSol;
-			++countDea;
-		}
-
-	}		
+	}
 }
 
 void getActionDoc(Board *doctor, Board *target)
 {
 	int prob = rand()%100;
-	if (target->character == CIT || target->character == INF) {
-		if (prob < 7) {
+	if (prob < 20) {
+		if (target->character == CIT) {
+			--countCit;
 			++countNur;
-			if (target->character == CIT) --countCit;
-			else --countInf;
+
 			target->character = NUR;
-			elapsed = 0;
+		} else if (target->character == NUR) {
+			--countNur;
+			++countDoc;
+
+			target->character = DOC;
 		}
 	} else if (target->character == INF) {
-		if (prob < 17) {
-			target->character = CIT;
+		if (prob < 25) {
 			++countCit;
 			--countInf;
-			elapsed = 0;
+
+			target->character = CIT;
 		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
-			target->character = CIT;
 			++countCit;
 			--countDea;
-			elapsed = 0;
+
+			target->character = CIT;
 		}
 	}
+
+	elapsed = 0;
 }
 
 void getActionCit(Board *citizen, Board *target)
 {
 	int prob = rand()%100;
-	if (prob == 10) {
-		citizen->character = DOC;
+	if (prob == 20) {
 		--countCit;
-		++countDoc;
-		elapsed = 0;
-	} else if (prob == 23) {
-		citizen->character = INF;
-		--countCit;
-		++countDoc;
-		elapsed = 0;
+		++countSol;
+
+		citizen->character = SOL;
 	}
 }
 
@@ -225,60 +244,69 @@ void getActionSol(Board **board, Board *soldier, Board *target, int x, int y)
 		prob = rand()%100;
 	} 
 
-	if (prob < 25) {
-
-		int shoot = 1;
-		for (int i = y - 2; i < y + 3; i++) {
-			for (int j = x - 3; j < x + 4; j++) {
-				if (j >= 0 && j < X && i >=0 && i < Y) {
-					if (board[i][j].character == CIT) {
-						shoot = 0;
-					}
-				}
-			}
-		}
-
-		if (shoot) {
+	if (prob < 80) { 
+		if (canShoot(board, x, y)) {
 			if (target->character == INF) {
-				target->character = DEAD;
 				++countDea;
 				--countInf;
+
+				target->character = DEAD;
 				elapsed = 0;
 			} else if (prob < 2 && (target->character == NUR || target->character == DOC)) {
 				if (target->character == NUR) --countNur;
 				else --countDoc;
 				++countDea;
+
 				target->character = DEAD;
 				elapsed = 0;
 			}
 		}
 
 		if (target->character == CIT) {
-			if (prob < 20) {
-				target->character = SOL;
+			if (prob >= 90) {
 				--countCit;
 				++countSol;
+
+				target->character = SOL;
 				elapsed = 0;
 			}
 		} else if (target->character == DEAD) {
-			target->character = EMPTY;
 			--countDea;
+
+			target->character = EMPTY;
 		}
 	}
+}
+
+int canShoot(Board **board, int x, int y)
+{
+	for (int i = y - 2; i < y + 3; i++) {
+		for (int j = x - 3; j < x + 4; j++) {
+			if (j >= 0 && j < X && i >=0 && i < Y) {
+				if (board[i][j].character == CIT) {
+					return 0;
+				}
+			}
+		}
+	}
+
+	return 1;
 }
 
 void getActionNurse(Board *nurse, Board *target)
 {
 	int prob = rand()%100;
 	if (target->character == INF) {
-		if (prob < 3) {
-			target->character = NUR;
+		/*if (prob < 3) {
 			--countInf;
 			++countNur;
-		} else if (prob < 17) {
-			target->character = CIT;
+
+			target->character = NUR;
+		} else*/ if (prob < 20) {
 			--countInf;
 			++countCit;
+
+			target->character = CIT;
 		}
 	}
 }

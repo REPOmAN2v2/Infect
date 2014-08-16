@@ -15,10 +15,11 @@ typedef struct _board {
 	int direction;
 } Board;
 
-extern unsigned int 	countDoc, countInf, countNur, countSol, 
+extern unsigned int countDoc, countInf, countNur, countSol, 
 				countCit, countDea, elapsed, total;
 extern const unsigned int localTimeout;
 extern unsigned int X, Y, refreshRate;
+extern int stepthrough;
 
 void checkWin(Board **board, unsigned int);
 void win(Board **board, int, unsigned int);

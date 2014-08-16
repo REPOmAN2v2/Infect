@@ -3,6 +3,7 @@
 #include "generation.h"
 
 unsigned int X = 79, Y = 20;
+int stepthrough = 0;
 
 Board ** parseArgs(int argc, char **argv)
 {
@@ -42,6 +43,8 @@ Board ** parseArgs(int argc, char **argv)
 	        	refreshRate = 5;
 	        } else if (strcmp(argv[i], "--fastest") == 0) {
 	        	refreshRate = 1;
+	        } else if (strcmp(argv[i], "--debug") == 0) {
+	        	stepthrough = 1;
 	        }
 		}
 	}
@@ -51,7 +54,7 @@ Board ** parseArgs(int argc, char **argv)
 			countDoc = (X*Y*0.01)+1;
 		}
 		if (!bInfected) {
-			countInf = (X*Y*0.01)+1;
+			countInf = (X*Y*0.005)+1;
 		}
 		if (!bSoldier) {
 			countSol = (X*Y*0.02)+1;
@@ -200,7 +203,7 @@ void fillBoard(Board **board, int y, const char* line)
 
 Board **initDefault()
 {
-	countCit = X*Y - countDoc - countSol - countInf;
+	countCit = X*Y - countDoc - countSol - countInf - countNur;
 	total = X*Y;
 
 	Board **board = initBoard();

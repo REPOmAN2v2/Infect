@@ -28,6 +28,9 @@ int main (int argc, char **argv)
 		getActions(board);
 		getMoves(board);
 		++days;
+		if (stepthrough) {
+			while (getch() != 'n');
+		}
 	} while (1);	
 }
 
