@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "generation.h"
+#include "display.h"
 
 unsigned int X = 79, Y = 20;
 int stepthrough = 0;
@@ -29,6 +30,8 @@ Board ** parseArgs(int argc, char **argv)
 				checkArg(i, argc, argv, &bWood, map, &countWood);
 			} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 				printHelp();
+			} else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
+				printVersion();
 			} else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--map") == 0) {
 				if (i + 1 <= argc - 1) {
 					if (!size && !bDoctor && !bInfected && !bSoldier && !bNurse) {
@@ -91,25 +94,6 @@ int checkArg(int i, int argc, char **argv, int *check, int map, unsigned int *co
 			printError("Conflict between -m and -x/-y/-d/-i/-s/-n\n");
 		}
 	}
-}
-
-void printError(const char *error)
-{
-	fprintf(stderr, error);
-	printHelp();
-}
-
-void printHelp()
-{
-	fprintf(stdout, "--map/-m <str>\t\tSpecify a file to read from containing a map, incompatible with -x/-y\n");
-    fprintf(stdout, "-x <int>\t\tUse in conjunction with --y <int> to specify dimensions of auto-generated map\n");
-    fprintf(stdout, "-y <int>\t\tSee above\n");
-    fprintf(stdout, "-d/-i/-s/-n/-w <int>\tSpecify the number of doctors/infected/soldiers/nurses/wood.\n");
-    fprintf(stdout, "--slow\t\t\tRun the simulation with slow speed. Very slow.\n");
-    fprintf(stdout, "--fast\t\t\tRun the simulation with fast speed. Almost real-time!\n");
-    fprintf(stdout, "--fastest\t\tRun the simulation at fastest speed.\n");
-    fprintf(stdout, "Default values are x=79, y=20, fast speed, 16 doctors, 16 infected, 32 soldiers, 80 nurses and 790 wood. They scale with x and y.\n");
-    exit(EXIT_FAILURE);
 }
 
 Board ** getMap(const char* path)
