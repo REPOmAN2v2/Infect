@@ -10,6 +10,7 @@ void getActions(Board **);
 Board * getDelta(Board **, int, int);
 void checkTarget(Board **, int, int, action);
 void checkSoldierRadius(Board **, int, int);
+int canShoot(Board **board, int x, int y);
 void getActionInf(Board *, Board *);
 void getActionDoc(Board *, Board *);
 void getActionCit(Board *, Board *);

@@ -4,6 +4,9 @@
 #include "include.h"
 
 void initNcurses();
-int displayBoard(Board **board, int);
+int displayBoard(Board **);
+void printError(const char *);
+void printHelp();
+void printVersion();
 
 #endif

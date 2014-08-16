@@ -8,19 +8,20 @@
 
 typedef enum _directions {NORTH, WEST, SOUTH, EAST} Directions;
 typedef enum _deltas {NONE, N=-1, W=-1, S=1, E=1} Deltas;
-typedef enum _characters {EMPTY,DEAD, INF, DOC, CIT, SOL, NUR} Characters;
+typedef enum _characters {EMPTY,DEAD, INF, DOC, CIT, SOL, NUR, WALL} Characters;
 
 typedef struct _board {
 	Characters character;
 	int direction;
 } Board;
 
-extern unsigned int 	countDoc, countInf, countNur, countSol, 
-				countCit, countDea, elapsed, total;
+extern unsigned int countDoc, countInf, countNur, countSol, 
+				countCit, countDea, elapsed, total, countWood;
 extern const unsigned int localTimeout;
-extern unsigned int X, Y, refreshRate;
+extern unsigned int X, Y, refreshRate, days;
+extern int stepthrough;
 
-void checkWin(Board **board, unsigned int);
-void win(Board **board, int, unsigned int);
+void checkWin(Board **board);
+void win(Board **board, int);
 
 #endif

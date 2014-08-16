@@ -6,13 +6,12 @@
 #include "generation.h"
 
 unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
-				countCit = 0, countDea = 0, elapsed = 0, total = 0;
+				countCit = 0, countDea = 0, countWood = 0, elapsed = 0, total = 0;
 const unsigned int localTimeout = 200000;
-unsigned int refreshRate = 5;
+unsigned int refreshRate = 5, days = 0;
 
 int main (int argc, char **argv) 
 {
-	unsigned int days = 0;
 	srand(time(NULL));
 
 	Board **board = parseArgs(argc, argv);
@@ -20,37 +19,43 @@ int main (int argc, char **argv)
 
 	do {
 		if (!(days % refreshRate)) {
-			displayBoard(board, days);
+			displayBoard(board);
 			refresh();
 			sleep(1);
 		}
-		checkWin(board, days);
+		checkWin(board);
 		getActions(board);
 		getMoves(board);
 		++days;
+		if (stepthrough) {
+			while (getch() != 'n');
+		}
 	} while (1);	
 }
 
-void checkWin(Board **board, unsigned int days) 
+void checkWin(Board **board) 
 {
-	if (countInf >= total*0.8) {
-		win(board, 0, days);
-	}
-	if (elapsed >= localTimeout || !countInf) {
-		win(board, 1, days);
+	if (countInf >= (countCit + countNur + countDoc + countSol)*25) {
+		win(board, 0);
+	} else if (countSol >= (countCit + countNur + countDoc)*1.5 && countSol >= countInf) {
+		win(board, 3);
+	} else if (elapsed >= localTimeout) {
+		win(board, 1);
+	} else if (!countInf) {
+		win(board, 2);
 	}
 }
 	
-void win(Board **board, int outcome, unsigned int days)
+void win(Board **board, int outcome)
 {
-	int pos = displayBoard(board, days);
+	int pos = displayBoard(board);
 
-	if (outcome == 1) {
-		if (!countInf) {
-			mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
-		} else {
-			mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
-		}
+	if (outcome == 2) {
+		mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
+	} else if (outcome == 1) {
+		mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
+	} else if (outcome == 3) {
+		mvprintw(++pos, 0, "It only took %u days for a military dictatorship to be established\n", days);
 	} else {
 		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", days);
 	}
