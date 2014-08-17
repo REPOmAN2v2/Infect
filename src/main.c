@@ -19,6 +19,7 @@ int main (int argc, char **argv)
 
 	do {
 		if (!(days % refreshRate)) {
+			clear();
 			displayBoard(board);
 			refresh();
 			sleep(1);
