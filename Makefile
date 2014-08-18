@@ -3,10 +3,10 @@ BDIR=./bin
 SRC=./src
 
 CC = gcc
-LDFLAGS = -lncurses
+LDFLAGS = -lmenu -lncurses
 CFLAGS := -Wall -g -std=c11
 
-_HEADERS := display.h generation.h gameplay.h
+_HEADERS := display.h generation.h gameplay.h gamemenu.h
 _OBJECTS := $(_HEADERS:.h=.o)
 OBJECTS = $(patsubst %,$(ODIR)/%,$(_OBJECTS))
 HEADERS = $(patsubst %,$(SRC)/%,$(_HEADERS))

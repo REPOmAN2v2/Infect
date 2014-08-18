@@ -4,6 +4,7 @@
 #include "display.h"
 #include "gameplay.h"
 #include "generation.h"
+#include "gamemenu.h"
 
 unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
 				countCit = 0, countDea = 0, countWood = 0, elapsed = 0, total = 0;
@@ -13,6 +14,7 @@ unsigned int refreshRate = 5, days = 0;
 int main (int argc, char **argv) 
 {
 	srand(time(NULL));
+	displayMenu();
 
 	Board **board = parseArgs(argc, argv);
 	initNcurses();
