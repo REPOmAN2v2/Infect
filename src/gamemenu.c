@@ -2,8 +2,6 @@
 #include "gamemenu.h"
 
 char *choices[] = {
-                        "Speed: ",
-                        "Debug: ",
                         "Game width: ",
                         "Game height: ",
 						"Doctors: ",
@@ -11,6 +9,8 @@ char *choices[] = {
 						"Nurses: ",
                         "Soldiers: ",
                         "Wood: ",
+                        "Speed: ",
+                        "Debug: ",
                         "Exit",
                         (char *)NULL
                   };
@@ -39,7 +39,7 @@ void displayMenu()
 
 
 	List *listSpeeds = createList(speeds);
-	listSpeeds = listSpeeds->previous; // Default value is Fast
+	listSpeeds = listSpeeds->previous; // Default value is Faster
 	List *listDebug = createList(debug);
 	listDebug = listDebug->next; // Default value is No
 
@@ -109,7 +109,7 @@ void displayMenu()
 			{
 				cur_item = current_item(my_menu);
 				p toggleDown = item_userptr(cur_item);
-				toggleDown(cur_item, DOWN, &listSpeeds, &listDebug);
+				toggleDown(cur_item, DOWN, &listSpeeds, &listDebug, counters);
 				// listTest(my_menu_win);
 				// menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -120,7 +120,7 @@ void displayMenu()
 			case 'k':
 			{	cur_item = current_item(my_menu);
 				p toggleUp = item_userptr(cur_item);
-				toggleUp(cur_item, UP, &listSpeeds, &listDebug);
+				toggleUp(cur_item, UP, &listSpeeds, &listDebug, counters);
 				// listTest(my_menu_win);
 				menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -154,26 +154,26 @@ void fillItems(ITEM **my_items, int counters[], List *listSpeeds, List *listDebu
 	/* 	You should only pass strings from the heap, global memory or
 		the string literal pool to new_item(). Why? Because if you 
 		look through the source, the item description points to the
-		string we passed, so you shouldn't pass strings in the stack.
+		string we passed, so you shouldn't pass strings from the stack.
 		Freeing the description before changing it is left to the user.
 
 		This results in some ugly things, not only to convert counters 
 		to strings, but also to make sure we can free the strings safely 
-		later on.
+		later on. This is the best way to do this I've found so far.
 		*/
-
-	my_items[0] = new_item(choices[0], convertToHeapString(listSpeeds->value));
-	set_item_userptr(my_items[0], toggleValue);
-
-	my_items[1] = new_item(choices[1], convertToHeapString(listDebug->value));
-	set_item_userptr(my_items[1], toggleValue);
 
 	for (size_t i = XC; i <= WOODC; i++) {
 		char buffer[10];
 		sprintf(buffer, "%d", counters[i]);
-		my_items[i+2] = new_item(choices[i+2], convertToHeapString(buffer));
-		set_item_userptr(my_items[i+2], func);
+		my_items[i] = new_item(choices[i], convertToHeapString(buffer));
+		set_item_userptr(my_items[i], toggleValue);
 	}
+
+	my_items[7] = new_item(choices[7], convertToHeapString(listSpeeds->value));
+	set_item_userptr(my_items[7], toggleValue);
+
+	my_items[8] = new_item(choices[8], convertToHeapString(listDebug->value));
+	set_item_userptr(my_items[8], toggleValue);
 
 	my_items[9] = new_item(choices[9], NULL);
 }
@@ -253,6 +253,7 @@ List * createList(char *strings[])
 	List *root;
 
 	if (node == NULL) {
+		endwin();
 		fprintf(stderr, "Couldn't allocate memory\n");
 		exit(EXIT_FAILURE);
 	}
@@ -261,11 +262,11 @@ List * createList(char *strings[])
 	node->next = node->previous = NULL;
 
 	root = node;
-	// fprintf(stdout, "Node: %s, Root: %s\n", node->value, root->value);
 
 	for (size_t i = 1; strings[i] != NULL; i++) {
 		List *new = malloc(sizeof(List));
 		if (new == NULL) {
+			endwin();
 			fprintf(stderr, "Couldn't allocate memory\n");
 			exit(EXIT_FAILURE);
 		}
@@ -274,17 +275,10 @@ List * createList(char *strings[])
 		new->previous = node;
 		new->next = NULL;
 		node = new;
-		// fprintf(stdout, "Node: %s, Root: %s\n", node->value, root->value);
 	}
 
 	node->next = root;
 	root->previous = node;
-
-
-	/*fprintf(stdout, "Node: %s, Root: %s\n", node->value, root->value);
-
-	fprintf(stdout, "Root: %s, Root->next: %s, Root->previous: %s\n", root->value, root->next->value, root->previous->value);
-	fprintf(stdout, "Root->next->previous: %s, Root->previous->next: %s\n", root->next->previous->value, root->previous->next->value);*/
 
 	return root;
 }
@@ -329,20 +323,30 @@ void func(ITEM *item, int direction)
 	mvprintw(20, 0, "Item selected is : %s", name);
 }
 
-void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug)
+void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug, int counters[])
 {
 	int index = item_index(item);
 
-	switch (index) {
-		case 0:
-			*listSpeeds = direction == UP ? (*listSpeeds)->next : (*listSpeeds)->previous;
-			set_item_description(item, convertToHeapString((*listSpeeds)->value));
-			break;
-		case 1:
-			*listDebug = direction == UP ? (*listDebug)->next : (*listDebug)->previous;
-			set_item_description(item, convertToHeapString((*listDebug)->value));
-			break;
-		case 2:
-			break;
+	if (index == 7) {
+		*listSpeeds = direction == UP ? (*listSpeeds)->next : (*listSpeeds)->previous;
+		set_item_description(item, convertToHeapString((*listSpeeds)->value));
+	} else if (index == 8) {
+		*listDebug = direction == UP ? (*listDebug)->next : (*listDebug)->previous;
+		set_item_description(item, convertToHeapString((*listDebug)->value));
+	} else {
+		updateNumericValue(item, direction, counters, index);
+	}
+}
+
+void updateNumericValue(ITEM *item, int direction, int counters[], int index)
+{
+	char buffer[10];
+
+	if (direction == UP) {
+		sprintf(buffer, "%d", ++counters[index]);
+		set_item_description(item, convertToHeapString(buffer));
+	} else {
+		sprintf(buffer, "%d", --counters[index]);
+		set_item_description(item, convertToHeapString(buffer));
 	}
 }
