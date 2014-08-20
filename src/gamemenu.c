@@ -4,7 +4,7 @@
 char *choices[] = {
                         "Speed: ",
                         "Debug: ",
-                        "Game blablablabla width: ",
+                        "Game width: ",
                         "Game height: ",
 						"Doctors: ",
 						"Infected: ",
@@ -27,6 +27,8 @@ char *debug[] = {
 	"No",
 	(char *)NULL
 };
+
+//const char cock[] = "79";
 
 void displayMenu()
 {	
@@ -89,7 +91,7 @@ void displayMenu()
 	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 38);
 	mvwaddch(my_menu_win, 2, 39, ACS_RTEE);
 
-	/* Set fore ground and back ground of the menu */
+	/* Set foreground and background of the menu */
 	set_menu_fore(my_menu, COLOR_PAIR(1) | A_REVERSE);
 	set_menu_back(my_menu, COLOR_PAIR(2));
 	set_menu_grey(my_menu, COLOR_PAIR(3));
@@ -109,7 +111,7 @@ void displayMenu()
 			{
 				cur_item = current_item(my_menu);
 				p toggleDown = item_userptr(cur_item);
-				toggleDown(cur_item, DOWN);
+				toggleDown(cur_item, DOWN,listSpeeds, listDebug);
 				// listTest(my_menu_win);
 				// menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -120,7 +122,7 @@ void displayMenu()
 			case 'k':
 			{	cur_item = current_item(my_menu);
 				p toggleUp = item_userptr(cur_item);
-				toggleUp(cur_item, UP);
+				toggleUp(cur_item, UP,listSpeeds, listDebug);
 				// listTest(my_menu_win);
 				menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -151,23 +153,43 @@ void displayMenu()
 
 void fillItems(ITEM **my_items, int counters[], List *listSpeeds, List *listDebug)
 {
-	my_items[0] = new_item(choices[0], listSpeeds->value);
-	set_item_userptr(my_items[0], toggleValue);
-	fprintf(stderr, "(%s,%s)\n", listSpeeds->value, my_items[0]->description.str);
+	/* 	You should only pass strings from the heap, global memory or
+		the string literal pool to new_item(). Why? Because if you 
+		look through the source, the item description points to the
+		string we passed, so you shouldn't pass strings in the stack.
+		Freeing the description before changing it is left to the user.
 
-	my_items[1] = new_item(choices[1], listDebug->value);
+		This results in some ugly things, not only to convert counters 
+		to strings, but also to make sure we can free the strings safely 
+		later on.
+		*/
+
+	my_items[0] = new_item(choices[0], convertToHeapString(listSpeeds->value));
+	set_item_userptr(my_items[0], toggleValue);
+
+	my_items[1] = new_item(choices[1], convertToHeapString(listDebug->value));
 	set_item_userptr(my_items[1], toggleValue);
-	fprintf(stderr, "(%s,%s)\n", listDebug->value, my_items[1]->description.str);
 
 	for (size_t i = XC; i <= WOODC; i++) {
 		char buffer[10];
 		sprintf(buffer, "%d", counters[i]);
-		my_items[i+2] = new_item(choices[i+2], (const char*)buffer);
-		fprintf(stderr, "(%s,%s)\n", buffer, my_items[i+2]->description.str);
+		my_items[i+2] = new_item(choices[i+2], convertToHeapString(buffer));
 		set_item_userptr(my_items[i+2], func);
 	}
 
 	my_items[9] = new_item(choices[9], NULL);
+}
+
+char * convertToHeapString(char *string)
+{
+	char *heapString = strdup(string);
+	if (heapString == NULL) {
+		endwin();
+		fprintf(stderr, "Could not convert to heap string.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return heapString;
 }
 
 void updateUnits(int counter[])
@@ -177,7 +199,6 @@ void updateUnits(int counter[])
 	counter[SOLC] = (counter[XC] * counter[YC] * 0.02) + 1;
 	counter[NURC] = (counter[XC] * counter[YC] * 0.05) + 1;
 	counter[WOODC] = (counter[XC] * counter[YC] * 0.5);
-	fprintf(stderr, "%d, %d, %d, %d, %d\n", counter[DOCC], counter[INFC], counter[SOLC], counter[NURC], counter[WOODC]);
 }
 
 void listTest(WINDOW *win, List *listSpeeds)
@@ -196,7 +217,7 @@ void listTest(WINDOW *win, List *listSpeeds)
 		test = test->next;
 		refresh();
 		sleep(1);
-	} while (++i < 10);
+	} while (++i < 6);
 
 	move(LINES - 4, 0);
 	clrtoeol();
@@ -211,7 +232,7 @@ void listTest(WINDOW *win, List *listSpeeds)
 		test = test->previous;
 		refresh();
 		sleep(1);
-	} while (++i < 10);
+	} while (++i < 6);
 
 	move(LINES - 4, 0);
 	clrtoeol();
@@ -220,6 +241,10 @@ void listTest(WINDOW *win, List *listSpeeds)
 
 void set_item_description (ITEM *item, const char *description)
 {   
+	if (item->description.str != NULL) {
+		free((void*)(item->description).str);
+	}
+
 	item->description.length = strlen(description);
 	item->description.str = description;
 }
@@ -313,11 +338,11 @@ void toggleValue(ITEM *item, int direction, List *listSpeeds, List *listDebug)
 	switch (index) {
 		case 0:
 			listSpeeds = direction == UP ? listSpeeds->next : listSpeeds->previous;
-			set_item_description(item, listSpeeds->value);
+			set_item_description(item, convertToHeapString(listSpeeds->value));
 			break;
 		case 1:
 			listDebug = direction == UP ? listDebug->next : listDebug->previous;
-			set_item_description(item, listDebug->value);
+			set_item_description(item, convertToHeapString(listDebug->value));
 			break;
 		case 2:
 			break;

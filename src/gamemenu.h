@@ -11,7 +11,7 @@
 enum {DOWN = -1, UP = 1};
 typedef enum _counters {XC, YC, DOCC, NURC, INFC, SOLC, WOODC} Counters;
 
-typedef void (*p)(void *, int);
+typedef void (*p)(void *, int, void *, void *);
 typedef struct _list List;
 
 struct _list {
@@ -24,6 +24,7 @@ void displayMenu();
 List * createList(char *strings[]);
 void updateUnits(int counter[]);
 void fillItems(ITEM **, int [], List *, List *);
+char * convertToHeapString(char *string);
 void listTest(WINDOW *, List *);
 void print_in_middle(WINDOW *, int, int, int, char *, chtype);
 void func(ITEM *, int);
