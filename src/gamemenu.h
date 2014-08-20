@@ -28,7 +28,7 @@ char * convertToHeapString(char *string);
 void listTest(WINDOW *, List *);
 void print_in_middle(WINDOW *, int, int, int, char *, chtype);
 void func(ITEM *, int);
-void toggleValue(ITEM *, int, List *, List *);
+void toggleValue(ITEM *, int, List **, List **);
 void set_item_description (ITEM *, const char *);
 
 #endif

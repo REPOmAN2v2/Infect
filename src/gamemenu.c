@@ -28,8 +28,6 @@ char *debug[] = {
 	(char *)NULL
 };
 
-//const char cock[] = "79";
-
 void displayMenu()
 {	
 	ITEM **my_items;
@@ -41,7 +39,7 @@ void displayMenu()
 
 
 	List *listSpeeds = createList(speeds);
-	listSpeeds = listSpeeds->next; // Default value is Fast
+	listSpeeds = listSpeeds->previous; // Default value is Fast
 	List *listDebug = createList(debug);
 	listDebug = listDebug->next; // Default value is No
 
@@ -111,7 +109,7 @@ void displayMenu()
 			{
 				cur_item = current_item(my_menu);
 				p toggleDown = item_userptr(cur_item);
-				toggleDown(cur_item, DOWN,listSpeeds, listDebug);
+				toggleDown(cur_item, DOWN, &listSpeeds, &listDebug);
 				// listTest(my_menu_win);
 				// menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -122,7 +120,7 @@ void displayMenu()
 			case 'k':
 			{	cur_item = current_item(my_menu);
 				p toggleUp = item_userptr(cur_item);
-				toggleUp(cur_item, UP,listSpeeds, listDebug);
+				toggleUp(cur_item, UP, &listSpeeds, &listDebug);
 				// listTest(my_menu_win);
 				menu_driver(my_menu, REQ_TOGGLE_ITEM);
 			}
@@ -331,18 +329,18 @@ void func(ITEM *item, int direction)
 	mvprintw(20, 0, "Item selected is : %s", name);
 }
 
-void toggleValue(ITEM *item, int direction, List *listSpeeds, List *listDebug)
+void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug)
 {
 	int index = item_index(item);
 
 	switch (index) {
 		case 0:
-			listSpeeds = direction == UP ? listSpeeds->next : listSpeeds->previous;
-			set_item_description(item, convertToHeapString(listSpeeds->value));
+			*listSpeeds = direction == UP ? (*listSpeeds)->next : (*listSpeeds)->previous;
+			set_item_description(item, convertToHeapString((*listSpeeds)->value));
 			break;
 		case 1:
-			listDebug = direction == UP ? listDebug->next : listDebug->previous;
-			set_item_description(item, convertToHeapString(listDebug->value));
+			*listDebug = direction == UP ? (*listDebug)->next : (*listDebug)->previous;
+			set_item_description(item, convertToHeapString((*listDebug)->value));
 			break;
 		case 2:
 			break;
