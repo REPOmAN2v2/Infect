@@ -21,13 +21,14 @@ struct _list {
 };
 
 void displayMenu();
+void eventLoop(MENU *, WINDOW *, List *, List *, int []);
 List * createList(char *strings[]);
+void freeList(List **);
+void quitMenu(MENU *, ITEM **, List *, List *);
 void updateUnits(int counter[]);
 void fillItems(ITEM **, int [], List *, List *);
 char * convertToHeapString(char *string);
-void listTest(WINDOW *, List *);
 void print_in_middle(WINDOW *, int, int, int, char *, chtype);
-void func(ITEM *, int);
 void toggleValue(ITEM *, int, List **, List **, int []);
 void updateNumericValue(ITEM *item, int direction, int counters[], int index);
 void set_item_description (ITEM *, const char *);

@@ -30,13 +30,10 @@ char *debug[] = {
 
 void displayMenu()
 {	
-	ITEM **my_items;
-	int c;				
-	MENU *my_menu;
-    int n_choices, index = 0;
-	ITEM *cur_item;
-	WINDOW *my_menu_win;
-
+	ITEM **my_items = NULL;
+	MENU *my_menu = NULL;
+	WINDOW *my_menu_win = NULL;
+    int n_choices = 0;
 
 	List *listSpeeds = createList(speeds);
 	listSpeeds = listSpeeds->previous; // Default value is Faster
@@ -102,6 +99,15 @@ void displayMenu()
 	mvprintw(LINES - 2, 0, "Up/k and Down/j keys to navigate (q to Exit)");
 	refresh();
 
+	eventLoop(my_menu, my_menu_win, listSpeeds, listDebug, counters);
+	quitMenu(my_menu, my_items, listSpeeds, listDebug);
+}
+
+void eventLoop(MENU *my_menu, WINDOW *my_menu_win, List *listSpeeds, List *listDebug, int counters[])
+{
+	int c = 0;
+	ITEM *cur_item = NULL;
+
 	while((c = getch()) != 'q')
 	{       
 		switch(c) {
@@ -110,8 +116,10 @@ void displayMenu()
 				cur_item = current_item(my_menu);
 				p toggleDown = item_userptr(cur_item);
 				toggleDown(cur_item, DOWN, &listSpeeds, &listDebug, counters);
-				// listTest(my_menu_win);
-				// menu_driver(my_menu, REQ_TOGGLE_ITEM);
+				//	This updates the item description on the screen
+				// 	Not sure how to do it otherwise
+				menu_driver(my_menu, REQ_DOWN_ITEM);
+				menu_driver(my_menu, REQ_UP_ITEM);
 			}
 				break;
 			case KEY_DOWN:
@@ -121,32 +129,47 @@ void displayMenu()
 			{	cur_item = current_item(my_menu);
 				p toggleUp = item_userptr(cur_item);
 				toggleUp(cur_item, UP, &listSpeeds, &listDebug, counters);
-				// listTest(my_menu_win);
-				menu_driver(my_menu, REQ_TOGGLE_ITEM);
+				menu_driver(my_menu, REQ_DOWN_ITEM);
+				menu_driver(my_menu, REQ_UP_ITEM);
 			}
 				break;
 			case KEY_UP:
 				menu_driver(my_menu, REQ_UP_ITEM);
 				break;
-			case 10:  /*Enter*/ 			{	
-				/*cur_item = current_item(my_menu);
-				//index = item_index(current_item(my_menu));
-				p = item_userptr(cur_item);
-				p(cur_item, UP);
-				//pos_menu_cursor(my_menu);
-				menu_driver(my_menu, REQ_TOGGLE_ITEM);*/
-				listTest(my_menu_win, listSpeeds);
-			}
-			break;
 		}
 		wrefresh(my_menu_win);
-	}	
+	}
+}
+
+void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
+{
 	unpost_menu(my_menu);
+	freeList(&listSpeeds);
+	freeList(&listDebug);
+	int n_choices = ARRAY_SIZE(choices);
 	for(size_t i = 0; i < n_choices; ++i)
 		free_item(my_items[i]);
 	free_menu(my_menu);
 	endwin();
 	exit(EXIT_SUCCESS);
+}
+
+void freeList(List **list)
+{
+	if (list && *list) {
+		List* next = (*list)->next;
+		while (next && (next != *list)) {
+			List *tmp = next;
+			next = next->next;
+			free(tmp->value);
+			free(tmp);
+		}
+
+		free((*list)->value);
+		free(*list);
+		*list = NULL;
+	}
+
 }
 
 void fillItems(ITEM **my_items, int counters[], List *listSpeeds, List *listDebug)
@@ -197,44 +220,6 @@ void updateUnits(int counter[])
 	counter[SOLC] = (counter[XC] * counter[YC] * 0.02) + 1;
 	counter[NURC] = (counter[XC] * counter[YC] * 0.05) + 1;
 	counter[WOODC] = (counter[XC] * counter[YC] * 0.5);
-}
-
-void listTest(WINDOW *win, List *listSpeeds)
-{
-	move(LINES - 4, 0);
-	clrtoeol();
-	mvprintw(LINES - 4, 0, "STARTING TEST");
-	refresh();
-	sleep(1);
-	List *test = listSpeeds;
-	int i = 0;
-	do {
-		move(LINES - 4, 0);
-		clrtoeol();
-		mvprintw(LINES - 4, 0, "%s", test->value);
-		test = test->next;
-		refresh();
-		sleep(1);
-	} while (++i < 6);
-
-	move(LINES - 4, 0);
-	clrtoeol();
-	mvprintw(LINES - 4, 0, "STARTING TEST");
-	refresh();
-	sleep(1);
-	i = 0;
-	do {
-		move(LINES - 4, 0);
-		clrtoeol();
-		mvprintw(LINES - 4, 0, "%s", test->value);
-		test = test->previous;
-		refresh();
-		sleep(1);
-	} while (++i < 6);
-
-	move(LINES - 4, 0);
-	clrtoeol();
-	mvprintw(LINES - 4, 0, "DONE");
 }
 
 void set_item_description (ITEM *item, const char *description)
@@ -314,15 +299,6 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 	refresh();
 }
 
-
-void func(ITEM *item, int direction)
-{	
-	char *name = (char*)item_name(item);
-	move(20, 0);
-	clrtoeol();
-	mvprintw(20, 0, "Item selected is : %s", name);
-}
-
 void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug, int counters[])
 {
 	int index = item_index(item);
@@ -346,7 +322,11 @@ void updateNumericValue(ITEM *item, int direction, int counters[], int index)
 		sprintf(buffer, "%d", ++counters[index]);
 		set_item_description(item, convertToHeapString(buffer));
 	} else {
-		sprintf(buffer, "%d", --counters[index]);
-		set_item_description(item, convertToHeapString(buffer));
+		if (counters[index] == 0) {
+			return;
+		} else {
+			sprintf(buffer, "%d", --counters[index]);
+			set_item_description(item, convertToHeapString(buffer));
+		}
 	}
 }
