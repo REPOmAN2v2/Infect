@@ -7,7 +7,7 @@ Epidemic simulator. The original idea, ruleset and gameplay elements were imagin
 
 ##Play
 
-Right now, the game isn't really interactive and is mostly a simulation. You can affect the game and try different scenarios using a few different command line arguments: 
+Right now, the game isn't really interactive and is mostly a simulation. You can affect the game and try different scenarios using the menu at the beginning of the game or by using a few different command line arguments: 
 
 - ```-h``` or ```--help```: print the help
 - ```-v``` or ```--version```: print the version information
@@ -19,17 +19,17 @@ Right now, the game isn't really interactive and is mostly a simulation. You can
 - ```-x``` and/or ```-y```: specify the dimensions of the map
 - ```-d```, ```-i```, ```-n```,```-s```, ```-w```: specify the number of doctors, infected, nurses, soldiers and/or wood
 
-The default arguments are X = 79, Y = 20, --fast. If you don't specify the x/y dimensions, 16 doctors, 16 infected, 32 soldiers and 80 nurses are spread randomly on the map and you get 790 wood logs. They scale with the dimensions automatically.
+The default arguments are X = 79, Y = 20, --fast. If you don't specify the x/y dimensions, 16 doctors, 16 infected, 32 soldiers and 80 nurses are spread randomly on the map and you get 790 wood logs. They scale with the dimensions automatically. Note that you can only load a map using the command line, not via the menu, right now.
 
 Press q to quit the current game after it has ended.
 
 ##Issues
 
-The default game isn't amazingly well balanced, but it doesn't matter that much since it's more fun with custom maps and custom arguments. The dead counter is also borked but it's rather funny having it show hundreds of thousands of dead people.
+The default game isn't amazingly well balanced, but it doesn't matter that much since it's more fun with custom maps and custom arguments. The unit logic might not be acting as it should be, so that needs to be tested and reviewed in the future.
 
 ##Version
 
-1.0
+1.1
 
 ##Installation
 

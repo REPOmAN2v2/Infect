@@ -12,7 +12,7 @@ char *choices[] = {
                         "Speed: ",
                         "Debug: ",
                         "Recalculate units",
-                        "Exit",
+                        "Play",
                         (char *)NULL
                   };
 
@@ -101,11 +101,16 @@ void displayMenu()
 	mvprintw(LINES - 1, 0, "Enter to select, q to quit");
 	refresh();
 
-	eventLoop(my_menu, my_menu_win, my_items, listSpeeds, listDebug, counters);
-	quitMenu(my_menu, my_items, listSpeeds, listDebug);
+	if (eventLoop(my_menu, my_menu_win, my_items, listSpeeds, listDebug, counters) == PLAY) {
+		updateGameConstants(counters, listSpeeds, listDebug);
+		quitMenu(my_menu, my_items, listSpeeds, listDebug);
+	} else {
+		quitMenu(my_menu, my_items, listSpeeds, listDebug);
+		exit(EXIT_SUCCESS);
+	}
 }
 
-void eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpeeds, List *listDebug, int counters[])
+int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpeeds, List *listDebug, int counters[])
 {
 	int c = 0;
 	ITEM *cur_item = NULL;
@@ -155,13 +160,15 @@ void eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSp
 						menu_driver(my_menu, REQ_UP_ITEM);
 					}
 				} else if (index == 10) {
-					return;
+					return PLAY;
 				}
 			}
 		} // end switch
 
 		wrefresh(my_menu_win);
 	} // end while
+
+	return QUIT;
 }
 
 void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
@@ -174,7 +181,6 @@ void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
 		free_item(my_items[i]);
 	free_menu(my_menu);
 	endwin();
-	exit(EXIT_SUCCESS);
 }
 
 void freeList(List **list)
@@ -250,6 +256,25 @@ void updateUnitsDisplay(ITEM **items, int counters[])
 		sprintf(buffer, "%d", counters[i]);
 		set_item_description(items[i], convertToHeapString(buffer));
 	}
+}
+
+void updateGameConstants(int counters[], List *listSpeeds, List *listDebug)
+{
+	countDoc = counters[DOCC];
+	countInf = counters[INFC];
+	countNur = counters[NURC];
+	countSol = counters[SOLC];
+	countWood = counters[WOODC];
+	
+	if (strcmp(listSpeeds->value, "Slow") == 0) {
+		refreshRate = 10;
+	} else if (strcmp(listSpeeds->value, "Fast") == 0) {
+		refreshRate = 5;
+	} else {
+		refreshRate = 1;
+	}
+
+	stepthrough = strcmp(listDebug->value, "Yes") == 0 ? 1 : 0;
 }
 
 void set_item_description (ITEM *item, const char *description)

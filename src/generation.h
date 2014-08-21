@@ -4,7 +4,7 @@
 #include "include.h"
 
 Board ** parseArgs(int, char **);
-int checkArg(int, int, char **, int *, int, unsigned int *);
+int checkArg(int, int, char **, int *, int, int *);
 Board ** getMap(const char*);
 Board ** initBoard();
 void fillBoard(Board **, int, const char*);

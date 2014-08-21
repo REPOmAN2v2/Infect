@@ -97,7 +97,7 @@ void printHelp()
 
 void printVersion()
 {
-	fprintf(stdout, "Infect 1.0\n");
+	fprintf(stdout, "Infect 1.1\n");
 	fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n");
 	fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 	fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");

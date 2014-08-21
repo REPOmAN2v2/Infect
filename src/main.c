@@ -6,17 +6,24 @@
 #include "generation.h"
 #include "gamemenu.h"
 
-unsigned int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
+int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
 				countCit = 0, countDea = 0, countWood = 0, elapsed = 0, total = 0;
-const unsigned int localTimeout = 200000;
-unsigned int refreshRate = 5, days = 0;
+const int localTimeout = 200000;
+int refreshRate = 5, days = 0, stepthrough = 0;
 
 int main (int argc, char **argv) 
 {
 	srand(time(NULL));
-	displayMenu();
 
-	Board **board = parseArgs(argc, argv);
+	Board **board = NULL;
+
+	if (argc == 1) {
+		displayMenu();
+		board = initDefault();
+	} else {
+		board = parseArgs(argc, argv);
+	}
+
 	initNcurses();
 
 	do {
