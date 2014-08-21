@@ -6,21 +6,46 @@
 #include <ncurses.h>
 #include <unistd.h>
 
-typedef enum _directions {NORTH, WEST, SOUTH, EAST} Directions;
-typedef enum _deltas {NONE, N=-1, W=-1, S=1, E=1} Deltas;
-typedef enum _characters {EMPTY,DEAD, INF, DOC, CIT, SOL, NUR, WALL} Characters;
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+
+typedef enum _characters {EMPTY, DEAD, INF, DOC, CIT, SOL, NUR, WALL} Characters;
+typedef enum _speeds {SLOW = 10, FAST = 5, FASTEST = 1} Speeds;
 
 typedef struct _board {
 	Characters character;
 	int direction;
 } Board;
 
-extern int countDoc, countInf, countNur, countSol, 
-				countCit, countDea, elapsed, total, countWood;
-extern const int localTimeout;
-extern int X, Y, refreshRate, days, stepthrough;
+typedef struct _units {
+	int doctors;
+	int infected;
+	int nurses;
+	int soldiers;
+	int citizens;
+	int dead;
+	int wood;
+	int total;
+} Units;
 
-void checkWin(Board **board);
-void win(Board **board, int);
+typedef struct _dimensions {
+	int x;
+	int y;
+} Dimensions;
+
+typedef struct _time {
+	int elapsed;
+	const int timeout;
+	int days;
+	int refreshRate;
+	int steps;
+} Time;
+
+typedef struct _variables {
+	Units units;
+	Dimensions dim;
+	Time time;
+} Variables;
+
+extern Variables gameVar;
 
 #endif

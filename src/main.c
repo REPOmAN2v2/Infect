@@ -6,10 +6,10 @@
 #include "generation.h"
 #include "gamemenu.h"
 
-int 	countDoc = 0, countInf = 0,  countNur = 0, countSol = 0, 
-				countCit = 0, countDea = 0, countWood = 0, elapsed = 0, total = 0;
-const int localTimeout = 200000;
-int refreshRate = 5, days = 0, stepthrough = 0;
+static void checkWin(Board **board);
+static void win(Board **board, int);
+
+Variables gameVar = {{0}, {79, 20}, {0, 20000, 0, FAST, 0}};
 
 int main (int argc, char **argv) 
 {
@@ -25,9 +25,10 @@ int main (int argc, char **argv)
 	}
 
 	initNcurses();
+	Time *times = &gameVar.time;
 
 	do {
-		if (!(days % refreshRate)) {
+		if (!(times->days % times->refreshRate)) {
 			clear();
 			displayBoard(board);
 			refresh();
@@ -36,8 +37,8 @@ int main (int argc, char **argv)
 		checkWin(board);
 		getActions(board);
 		getMoves(board);
-		++days;
-		if (stepthrough) {
+		++times->days;
+		if (times->steps) {
 			while (getch() != 'n');
 		}
 	} while (1);	
@@ -45,13 +46,16 @@ int main (int argc, char **argv)
 
 void checkWin(Board **board) 
 {
-	if (countInf >= (countCit + countNur + countDoc + countSol)*25) {
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
+	if (units->infected >= (units->citizens + units->nurses + units->doctors + units->soldiers)*25) {
 		win(board, 0);
-	} else if (countSol >= (countCit + countNur + countDoc)*1.5 && countSol >= countInf) {
+	} else if (units->soldiers >= (units->citizens + units->nurses + units->doctors)*1.5 && units->soldiers >= units->infected) {
 		win(board, 3);
-	} else if (elapsed >= localTimeout) {
+	} else if (times->elapsed >= times->timeout) {
 		win(board, 1);
-	} else if (!countInf) {
+	} else if (!units->infected) {
 		win(board, 2);
 	}
 }
@@ -59,15 +63,16 @@ void checkWin(Board **board)
 void win(Board **board, int outcome)
 {
 	int pos = displayBoard(board);
+	Time *times = &gameVar.time;
 
 	if (outcome == 2) {
-		mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", days);
+		mvprintw(++pos, 0, "It only took %u days for the infection to be eliminated\n", times->days);
 	} else if (outcome == 1) {
-		mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", days);
+		mvprintw(++pos, 0, "It only took %u days for the infection to be contained\n", times->days);
 	} else if (outcome == 3) {
-		mvprintw(++pos, 0, "It only took %u days for a military dictatorship to be established\n", days);
+		mvprintw(++pos, 0, "It only took %u days for a military dictatorship to be established\n", times->days);
 	} else {
-		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", days);
+		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", times->days);
 	}
 
 	//mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", 
@@ -77,7 +82,7 @@ void win(Board **board, int outcome)
 	refresh();
 	while(getch() != 'q');
 	endwin();
-	for(size_t i = 0; i < Y; i++)
+	for(size_t i = 0; i < gameVar.dim.y; i++)
 		free(board[i]);
 	free(board);
 

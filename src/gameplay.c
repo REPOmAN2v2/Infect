@@ -1,9 +1,33 @@
 #include "gameplay.h"
 
+/*
+ * Internal constants and definitions
+ */
+
+ typedef enum _directions {NORTH, WEST, SOUTH, EAST} Directions;
+ typedef enum _deltas {NONE, N=-1, W=-1, S=1, E=1} Deltas;
+
+/*
+ * Internal prototypes
+ */
+
+typedef void (*action)(Board*, Board*);
+
+static Board * getDelta(Board **board, int y, int x);
+static void checkTarget(Board **board, int y, int x, action getAction);
+static void checkSoldierRadius(Board **board, int y, int x);
+static int canShoot(Board **board, int x, int y);
+static void getActionInf(Board *infected, Board *target);
+static void getActionDoc(Board *doctor, Board *target);
+static void getActionCit(Board *citizen, Board *target);
+static void getActionSol(Board **board, Board *soldier, Board *target, int y, int x);
+static void getActionNurse(Board *nurse, Board *target);
+static int checkOutBounds(Board **board, Directions move, int y, int x);
+
 void getMoves(Board **board)
 {
-	for (size_t i = 0; i < Y; i++) {
-		for (size_t j = 0; j < X; j++) {
+	for (size_t i = 0; i < gameVar.dim.y; i++) {
+		for (size_t j = 0; j < gameVar.dim.x; j++) {
 			switch (board[i][j].character) {
 				case INF:
 				case DOC:
@@ -30,9 +54,12 @@ void getMoves(Board **board)
 
 void getActions(Board **board) 
 {
-	for (size_t i = 0; i < Y; i++) {
-		for (size_t j = 0; j < X; j++) {
-			++elapsed;
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
+	for (size_t i = 0; i < gameVar.dim.y; i++) {
+		for (size_t j = 0; j < gameVar.dim.x; j++) {
+			++times->elapsed;
 			board[i][j].direction = rand()%4; 
 			switch (board[i][j].character) {
 				case WALL:	//fallthrough
@@ -41,7 +68,7 @@ void getActions(Board **board)
 				case DEAD:
 					if (rand()%100 == 1) {
 						board[i][j].character = EMPTY;
-						--countDea;
+						--units->dead;
 					}
 				case INF:
 					for (board[i][j].direction = 0; board[i][j].direction < 4; board[i][j].direction++) {
@@ -116,184 +143,196 @@ void checkSoldierRadius(Board **board, int y, int x)
 		xt -= r2;
 	}
 
-	if (xt >= 0 && xt < X && yt >=0 && yt < Y) {
+	if (xt >= 0 && xt < gameVar.dim.x && yt >=0 && yt < gameVar.dim.y) {
 		Board *attacker = &board[y][x];
 		Board *target = &board[yt][xt];
-		getActionSol(board, attacker, target, x, y);
+		getActionSol(board, attacker, target, y, x);
 	}
 }
 
 void getActionInf(Board *infected,  Board *target)
 {
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
 	int prob = rand()%100;
 
 	if (rand()%100 >= 95) {
 		if (target->character == CIT) {
-			--countCit;
-			++countInf;
+			--units->citizens;
+			++units->infected;
 
 			target->character = INF;
-			elapsed = 0;
+			times->elapsed = 0;
 		} else if (target->character == WALL && prob < 5) {
 			target->character = EMPTY;
-			countWood += (rand()%25)+1;
+			units->wood += (rand()%25)+1;
 		} else if (target->character == DOC || target->character == NUR) {
 			if (prob < 25) {
-				if (target->character == DOC) --countDoc;
-				else --countNur;
-				++countDea;
+				if (target->character == DOC) --units->doctors;
+				else --units->nurses;
+				++units->dead;
 
 				target->character = DEAD;
 			} else if (prob < 30) {
-				--countInf;
-				++countDea;
+				--units->infected;
+				++units->dead;
 
 				infected->character = DEAD;
 			} else if (prob < 60) {
-				if (target->character == DOC) --countDoc;
-				else --countNur;
-				++countInf;
+				if (target->character == DOC) --units->doctors;
+				else --units->nurses;
+				++units->infected;
 
 				target->character = INF;
 			} else if (prob < 70) {
-				--countInf;
-				++countCit;
+				--units->infected;
+				++units->citizens;
 
 				infected->character = CIT;
 			} else if (prob < 100) {
-				if (target->character == DOC) --countDoc;
-				else --countNur;
-				--countInf;
-				countDea += 2;
+				if (target->character == DOC) --units->doctors;
+				else --units->nurses;
+				--units->infected;
+				units->dead += 2;
 
 				infected->character = DEAD;
 				target->character = DEAD;
 			}
 		} else if (target->character == SOL) {
 			if (prob < 10) {
-				--countInf;
-				++countDea;
+				--units->infected;
+				++units->dead;
 
 				infected->character = DEAD;
 			} else if (prob < 60) {
-				--countSol;
-				++countDea;
+				--units->soldiers;
+				++units->dead;
 
 				target->character = INF;
 				infected->character = DEAD;
 			} else if (prob < 90) {
-				--countSol;
-				++countInf;
+				--units->soldiers;
+				++units->infected;
 
 				target->character = INF;
 			} else {
-				--countSol;
-				++countDea;
+				--units->soldiers;
+				++units->dead;
 
 				target->character = DEAD;
 			}
 		}
-		elapsed = 0;
+		times->elapsed = 0;
 	}
 }
 
 void getActionDoc(Board *doctor, Board *target)
 {
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
 	int prob = rand()%100;
 	if (prob < 20) {
 		if (target->character == CIT) {
-			--countCit;
-			++countNur;
+			--units->citizens;
+			++units->nurses;
 
 			target->character = NUR;
 		} else if (target->character == NUR) {
-			--countNur;
-			++countDoc;
+			--units->nurses;
+			++units->doctors;
 
 			target->character = DOC;
 		}
 	} else if (target->character == INF) {
 		if (prob < 25) {
-			++countCit;
-			--countInf;
+			++units->citizens;
+			--units->infected;
 
 			target->character = CIT;
 		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
-			++countCit;
-			--countDea;
+			++units->citizens;
+			--units->dead;
 
 			target->character = CIT;
 		}
 	}
 
-	elapsed = 0;
+	times->elapsed = 0;
 }
 
 void getActionCit(Board *citizen, Board *target)
 {
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
 	int prob = rand()%100;
 	if (prob == 20) {
-		--countCit;
-		++countSol;
+		--units->citizens;
+		++units->soldiers;
 
 		citizen->character = SOL;
 	} else if (prob < 15) {
-		if (target->character == EMPTY && days >= 100 && countWood >= 25) {
+		if (target->character == EMPTY && times->days >= 100 && units->wood >= 25) {
 			target->character = WALL;
-			countWood -= (rand()%25)+1;
-			elapsed = 0;
+			units->wood -= (rand()%25)+1;
+			times->elapsed = 0;
 		}
 	}
 }
 
-void getActionSol(Board **board, Board *soldier, Board *target, int x, int y)
+void getActionSol(Board **board, Board *soldier, Board *target, int y, int x)
 {
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
 	int prob = rand()%100;
 	if (prob < 2 && (target->character == DOC || target->character == NUR)) {
 		prob = rand()%100;
 	} 
 
 	if (prob < 80) { 
-		if (canShoot(board, x, y)) {
+		if (canShoot(board, y, x)) {
 			if (target->character == INF) {
-				++countDea;
-				--countInf;
+				++units->dead;
+				--units->infected;
 
 				target->character = DEAD;
-				elapsed = 0;
+				times->elapsed = 0;
 			} else if (prob < 2 && (target->character == NUR || target->character == DOC)) {
-				if (target->character == NUR) --countNur;
-				else --countDoc;
-				++countDea;
+				if (target->character == NUR) --units->nurses;
+				else --units->doctors;
+				++units->dead;
 
 				target->character = DEAD;
-				elapsed = 0;
+				times->elapsed = 0;
 			}
 		}
 
 		if (target->character == CIT) {
 			if (prob >= 80) {
-				--countCit;
-				++countSol;
+				--units->citizens;
+				++units->soldiers;
 
 				target->character = SOL;
-				elapsed = 0;
+				times->elapsed = 0;
 			}
 		} else if (target->character == DEAD) {
-			--countDea;
+			--units->dead;
 
 			target->character = EMPTY;
 		}
 	}
 }
 
-int canShoot(Board **board, int x, int y)
+int canShoot(Board **board, int y, int x)
 {
 	for (int i = y - 2; i < y + 3; i++) {
 		for (int j = x - 3; j < x + 4; j++) {
-			if (j >= 0 && j < X && i >=0 && i < Y) {
+			if (j >= 0 && j < gameVar.dim.x && i >=0 && i < gameVar.dim.y) {
 				if (board[i][j].character == CIT) {
 					return 0;
 				}
@@ -306,6 +345,8 @@ int canShoot(Board **board, int x, int y)
 
 void getActionNurse(Board *nurse, Board *target)
 {
+	Units *units = &gameVar.units;
+
 	int prob = rand()%100;
 	if (target->character == INF) {
 		/*if (prob < 3) {
@@ -314,8 +355,8 @@ void getActionNurse(Board *nurse, Board *target)
 
 			target->character = NUR;
 		} else*/ if (prob < 20) {
-			--countInf;
-			++countCit;
+			--units->infected;
+			++units->citizens;
 
 			target->character = CIT;
 		}
@@ -327,10 +368,10 @@ int checkOutBounds(Board **board, Directions move, int y, int x)
 	if (move == NORTH) {		
 		return (y + N >= 0);
 	} else if (move == SOUTH) {
-		return (y + S < Y);
+		return (y + S < gameVar.dim.y);
 	} else if (move == WEST) {
 		return (x + W >= 0);
 	} else {
-		return (x + E < X);
+		return (x + E < gameVar.dim.x);
 	}
 }

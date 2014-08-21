@@ -1,10 +1,12 @@
 #include "display.h"
+#include <string.h>
 
 void initNcurses()
 {
 	initscr();
 	noecho();
 	cbreak();
+	keypad(stdscr, TRUE);
 	start_color();
 
 	init_pair(1, COLOR_RED, COLOR_BLACK);
@@ -17,10 +19,11 @@ void initNcurses()
 
 int displayBoard(Board **board) 
 {
+	Units *units = &gameVar.units;
 	size_t i;
 	
-	for (i = 0; i < Y; i++) {
-		for (size_t j = 0; j < X; j++) {
+	for (i = 0; i < gameVar.dim.y; i++) {
+		for (size_t j = 0; j < gameVar.dim.x; j++) {
 			switch (board[i][j].character) {
 				case SOL:
 					attron(COLOR_PAIR(4));
@@ -68,15 +71,16 @@ int displayBoard(Board **board)
 			}
 		}
 	}
-	mvprintw(i, 0, "Day %u", days);
+	mvprintw(i, 0, "Day %u", gameVar.time.days);
 	mvprintw(++i, 0, "Citizens: %u, Infected: %u, Doctors: %u, Nurses: %u, Soldiers: %u, Dead: %u", 
-		countCit, countInf, countDoc, countNur, countSol, countDea);
+		units->citizens, units->infected, units->doctors, units->nurses, units->soldiers, units->dead);
 
 	return i;
 }
 
 void printError(const char *error)
 {
+	endwin();
 	fprintf(stderr, error);
 	printHelp();
 }
@@ -102,4 +106,35 @@ void printVersion()
 	fprintf(stdout, "This is free software: you are free to change and redistribute it.\n");
 	fprintf(stdout, "There is NO WARRANTY, to the extent permitted by law.\n");
 	exit(EXIT_SUCCESS);
+}
+
+void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color)
+{
+	int length, x, y;
+	float temp;
+
+	if (win == NULL) {
+		win = stdscr;
+	}
+
+	getyx(win, y, x);
+	if (startx != 0) {
+		x = startx;
+	}
+
+	if (starty != 0) {
+		y = starty;
+	}
+
+	if (width == 0) {
+		width = 80;
+	}
+
+	length = strlen(string);
+	temp = (width - length) / 2;
+	x = startx + (int)temp;
+	wattron(win, color);
+	mvwprintw(win, y, x, "%s", string);
+	wattroff(win, color);
+	refresh();
 }

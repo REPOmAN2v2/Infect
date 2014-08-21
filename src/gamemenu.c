@@ -1,44 +1,80 @@
 #include <string.h>
 #include "gamemenu.h"
+#include "list.h"
+#include "display.h"
 
-char *choices[] = {
-                        "Game width: ",
-                        "Game height: ",
-						"Doctors: ",
-						"Infected: ",
-						"Nurses: ",
-                        "Soldiers: ",
-                        "Wood: ",
-                        "Speed: ",
-                        "Debug: ",
-                        "Recalculate units",
-                        "Play",
-                        (char *)NULL
-                  };
+/*
+ * Constants and defines
+ */
 
-char *speeds[] = {
+#define ENTER 	10
+
+enum {DOWN = -1, UP = 1};
+enum {QUIT, PLAY};
+enum {XC, YC, DOCC, INFC, NURC, SOLC, WOODC};
+
+/* 
+ * Arrays containing the menu item names and descriptions 
+ */
+
+static char *choices[] = {     
+	"Game width: ",
+    "Game height: ",
+	"Doctors: ",
+	"Infected: ",
+	"Nurses: ",
+    "Soldiers: ",
+    "Wood: ",
+    "Speed: ",
+    "Debug: ",
+    "Recalculate units",
+    "Play",
+    (char *)NULL
+};
+
+static char *speeds[] = {
 	"Slow",
 	"Fast",
 	"Fastest",
 	(char *)NULL
 };
 
-char *debug[] = {
+static char *debug[] = {
 	"Yes",
 	"No",
 	(char *)NULL
 };
 
+/*
+ * Internal global variables
+ */
+
+static ITEM **my_items = NULL;
+static MENU *my_menu = NULL;
+static WINDOW *my_menu_win = NULL;
+
+/*
+ * Internal function prototypes
+ */
+
+static int eventLoop(List **listSpeeds, List **listDebug, int counters[]);
+static void quitMenu(List *listSpeeds, List *listDebug);
+static void fillItems(int counters[], List *listSpeeds, List *listDebug);
+static char * convertToHeapString(char *string);
+static void updateUnits(int counters[]);
+static void updateUnitsDisplay(int counters[]);
+static void updateGameVariables(int counters[], List *listSpeeds, List *listDebug);
+static void set_item_description (ITEM *item, const char *description);
+static void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug, int counters[]);
+static void updateNumericValue(ITEM *item, int direction, int counters[], int index);
+
 void displayMenu()
 {	
-	ITEM **my_items = NULL;
-	MENU *my_menu = NULL;
-	WINDOW *my_menu_win = NULL;
     int n_choices = 0;
 
-	List *listSpeeds = createList(speeds);
+	List *listSpeeds = createCircularLinkedList(speeds);
 	listSpeeds = listSpeeds->previous; // Default value is Faster
-	List *listDebug = createList(debug);
+	List *listDebug = createCircularLinkedList(debug);
 	listDebug = listDebug->next; // Default value is No
 
 	int counters[7];
@@ -49,17 +85,10 @@ void displayMenu()
 	/* Initialize items */
 	n_choices = ARRAY_SIZE(choices);
 	my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-	fillItems(my_items, counters, listSpeeds, listDebug);
+	fillItems(counters, listSpeeds, listDebug);
 
-	/* Initialize curses */	
-	initscr();
-	start_color();
-	cbreak();
-	noecho();
-	keypad(stdscr, TRUE);
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-	init_pair(2, COLOR_GREEN, COLOR_BLACK);
-	init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
+	/* Initialize curses */
+	initNcurses();
 
 	/* Get offsets */
 	int offsetx = (COLS - 40) / 2;
@@ -90,7 +119,7 @@ void displayMenu()
 	/* Set foreground and background of the menu */
 	set_menu_fore(my_menu, COLOR_PAIR(1) | A_REVERSE);
 	set_menu_back(my_menu, COLOR_PAIR(2));
-	set_menu_grey(my_menu, COLOR_PAIR(3));
+	set_menu_grey(my_menu, COLOR_PAIR(4));
 
 	/* Post the menu */
 	post_menu(my_menu);
@@ -101,16 +130,16 @@ void displayMenu()
 	mvprintw(LINES - 1, 0, "Enter to select, q to quit");
 	refresh();
 
-	if (eventLoop(my_menu, my_menu_win, my_items, listSpeeds, listDebug, counters) == PLAY) {
-		updateGameConstants(counters, listSpeeds, listDebug);
-		quitMenu(my_menu, my_items, listSpeeds, listDebug);
+	if (eventLoop(&listSpeeds, &listDebug, counters) == PLAY) {
+		updateGameVariables(counters, listSpeeds, listDebug);
+		quitMenu(listSpeeds, listDebug);
 	} else {
-		quitMenu(my_menu, my_items, listSpeeds, listDebug);
+		quitMenu(listSpeeds, listDebug);
 		exit(EXIT_SUCCESS);
 	}
 }
 
-int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpeeds, List *listDebug, int counters[])
+int eventLoop(List **listSpeeds, List **listDebug, int counters[])
 {
 	int c = 0;
 	ITEM *cur_item = NULL;
@@ -122,9 +151,9 @@ int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpe
 			{
 				cur_item = current_item(my_menu);
 				if (item_index(cur_item) < 9) {
-					toggleValue(cur_item, DOWN, &listSpeeds, &listDebug, counters);
+					toggleValue(cur_item, DOWN, listSpeeds, listDebug, counters);
 				}
-				//	This updates the item description on the screen
+				//	This refreshes the item description on the screen
 				// 	Not sure how to do it otherwise
 				menu_driver(my_menu, REQ_DOWN_ITEM);
 				menu_driver(my_menu, REQ_UP_ITEM);
@@ -135,7 +164,7 @@ int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpe
 			{	
 				cur_item = current_item(my_menu);
 				if (item_index(cur_item) < 9) {
-					toggleValue(cur_item, UP, &listSpeeds, &listDebug, counters);
+					toggleValue(cur_item, UP, listSpeeds, listDebug, counters);
 				}
 				menu_driver(my_menu, REQ_DOWN_ITEM);
 				menu_driver(my_menu, REQ_UP_ITEM);
@@ -154,8 +183,8 @@ int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpe
 			{
 				int index = item_index(current_item(my_menu));
 				if (index == 9) {
-					updateUnitsDisplay(my_items, counters);
-					//	Iterate over every menu item to update their displayed value
+					updateUnitsDisplay(counters);
+					//	Iterate over every menu item to refresh their displayed value
 					for (size_t i = 0; i < 10; i++) {
 						menu_driver(my_menu, REQ_UP_ITEM);
 					}
@@ -171,11 +200,11 @@ int eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpe
 	return QUIT;
 }
 
-void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
+void quitMenu(List *listSpeeds, List *listDebug)
 {
 	unpost_menu(my_menu);
-	freeList(&listSpeeds);
-	freeList(&listDebug);
+	freeCircularLinkedList(&listSpeeds);
+	freeCircularLinkedList(&listDebug);
 	int n_choices = ARRAY_SIZE(choices);
 	for(size_t i = 0; i < n_choices; ++i)
 		free_item(my_items[i]);
@@ -183,36 +212,19 @@ void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
 	endwin();
 }
 
-void freeList(List **list)
+void fillItems(int counters[], List *listSpeeds, List *listDebug)
 {
-	if (list && *list) {
-		List* next = (*list)->next;
-		while (next && (next != *list)) {
-			List *tmp = next;
-			next = next->next;
-			free(tmp->value);
-			free(tmp);
-		}
-
-		free((*list)->value);
-		free(*list);
-		*list = NULL;
-	}
-
-}
-
-void fillItems(ITEM **my_items, int counters[], List *listSpeeds, List *listDebug)
-{
-	/* 	You should only pass strings from the heap, global memory or
-		the string literal pool to new_item(). Why? Because if you 
-		look through the source, the item description points to the
-		string we passed, so you shouldn't pass strings from the stack.
-		Freeing the description before changing it is left to the user.
-
-		This results in some ugly things, not only to convert counters 
-		to strings, but also to make sure we can free the strings safely 
-		later on. This is the best way to do this I've found so far.
-		*/
+	/* 	
+	 *	You should only pass strings from the heap, global memory or
+	 *	the string literal pool to new_item(). Why? Because if you 
+	 *	look through the source, the item description points to the
+	 *	string we passed, so you shouldn't pass strings from the stack.
+	 *	Freeing the description before changing it is left to the user.
+	 *
+	 *	This results in some ugly things, not only to convert counters 
+	 *	to strings, but also to make sure we can free the strings safely 
+	 *	later on. This is the best way to do this I've found so far.
+	 */
 
 	for (size_t i = XC; i <= WOODC; i++) {
 		char buffer[10];
@@ -230,9 +242,7 @@ char * convertToHeapString(char *string)
 {
 	char *heapString = strdup(string);
 	if (heapString == NULL) {
-		endwin();
-		fprintf(stderr, "Could not convert to heap string.\n");
-		exit(EXIT_FAILURE);
+		printError("Could not convert to heap string.\n");
 	}
 
 	return heapString;
@@ -247,34 +257,40 @@ void updateUnits(int counters[])
 	counters[WOODC] = (counters[XC] * counters[YC] * 0.5);
 }
 
-void updateUnitsDisplay(ITEM **items, int counters[])
+void updateUnitsDisplay(int counters[])
 {
 	char buffer[10];
 	updateUnits(counters);
 
 	for (size_t i = 0; i <= WOODC; i++) {
 		sprintf(buffer, "%d", counters[i]);
-		set_item_description(items[i], convertToHeapString(buffer));
+		set_item_description(my_items[i], convertToHeapString(buffer));
 	}
 }
 
-void updateGameConstants(int counters[], List *listSpeeds, List *listDebug)
+void updateGameVariables(int counters[], List *listSpeeds, List *listDebug)
 {
-	countDoc = counters[DOCC];
-	countInf = counters[INFC];
-	countNur = counters[NURC];
-	countSol = counters[SOLC];
-	countWood = counters[WOODC];
+	Units *units = &gameVar.units;
+	Time *times = &gameVar.time;
+
+	gameVar.dim.x = counters[XC];
+	gameVar.dim.y = counters[YC];
+
+	units->doctors = counters[DOCC];
+	units->infected = counters[INFC];
+	units->nurses = counters[NURC];
+	units->soldiers = counters[SOLC];
+	units->wood = counters[WOODC];
 	
 	if (strcmp(listSpeeds->value, "Slow") == 0) {
-		refreshRate = 10;
+		times->refreshRate = SLOW;
 	} else if (strcmp(listSpeeds->value, "Fast") == 0) {
-		refreshRate = 5;
+		times->refreshRate = FAST;
 	} else {
-		refreshRate = 1;
+		times->refreshRate = FASTEST;
 	}
 
-	stepthrough = strcmp(listDebug->value, "Yes") == 0 ? 1 : 0;
+	times->steps = strcmp(listDebug->value, "Yes") == 0 ? 1 : 0;
 }
 
 void set_item_description (ITEM *item, const char *description)
@@ -285,73 +301,6 @@ void set_item_description (ITEM *item, const char *description)
 
 	item->description.length = strlen(description);
 	item->description.str = description;
-}
-
-List * createList(char *strings[])
-{
-	List *node = malloc(sizeof(List));
-	List *root;
-
-	if (node == NULL) {
-		endwin();
-		fprintf(stderr, "Couldn't allocate memory\n");
-		exit(EXIT_FAILURE);
-	}
-
-	node->value = strdup(strings[0]);
-	node->next = node->previous = NULL;
-
-	root = node;
-
-	for (size_t i = 1; strings[i] != NULL; i++) {
-		List *new = malloc(sizeof(List));
-		if (new == NULL) {
-			endwin();
-			fprintf(stderr, "Couldn't allocate memory\n");
-			exit(EXIT_FAILURE);
-		}
-		new->value = strdup(strings[i]);
-		node->next = new;
-		new->previous = node;
-		new->next = NULL;
-		node = new;
-	}
-
-	node->next = root;
-	root->previous = node;
-
-	return root;
-}
-
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color)
-{
-	int length, x, y;
-	float temp;
-
-	if (win == NULL) {
-		win = stdscr;
-	}
-
-	getyx(win, y, x);
-	if (startx != 0) {
-		x = startx;
-	}
-
-	if (starty != 0) {
-		y = starty;
-	}
-
-	if (width == 0) {
-		width = 80;
-	}
-
-	length = strlen(string);
-	temp = (width - length) / 2;
-	x = startx + (int)temp;
-	wattron(win, color);
-	mvwprintw(win, y, x, "%s", string);
-	wattroff(win, color);
-	refresh();
 }
 
 void toggleValue(ITEM *item, int direction, List **listSpeeds, List **listDebug, int counters[])

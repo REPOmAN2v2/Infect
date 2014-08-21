@@ -3,13 +3,7 @@
 
 #include "include.h"
 
-Board ** parseArgs(int, char **);
-int checkArg(int, int, char **, int *, int, int *);
-Board ** getMap(const char*);
-Board ** initBoard();
-void fillBoard(Board **, int, const char*);
+Board ** parseArgs(int argc, char **argv);
 Board **initDefault();
-void defaultBoard(Board **);
-void generateCoord(Board **, const int, Characters);
 
 #endif
