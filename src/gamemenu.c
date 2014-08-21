@@ -11,6 +11,7 @@ char *choices[] = {
                         "Wood: ",
                         "Speed: ",
                         "Debug: ",
+                        "Recalculate units",
                         "Exit",
                         (char *)NULL
                   };
@@ -95,15 +96,16 @@ void displayMenu()
 	post_menu(my_menu);
 	wrefresh(my_menu_win);
 
-	mvprintw(LINES - 3, 0, "Press <ENTER> to see the option selected");
-	mvprintw(LINES - 2, 0, "Up/k and Down/j keys to navigate (q to Exit)");
+	mvprintw(LINES - 3, 0, "Up and down arrow keys to navigate");
+	mvprintw(LINES - 2, 0, "k and j to increment and decrement");
+	mvprintw(LINES - 1, 0, "Enter to select, q to quit");
 	refresh();
 
-	eventLoop(my_menu, my_menu_win, listSpeeds, listDebug, counters);
+	eventLoop(my_menu, my_menu_win, my_items, listSpeeds, listDebug, counters);
 	quitMenu(my_menu, my_items, listSpeeds, listDebug);
 }
 
-void eventLoop(MENU *my_menu, WINDOW *my_menu_win, List *listSpeeds, List *listDebug, int counters[])
+void eventLoop(MENU *my_menu, WINDOW *my_menu_win, ITEM **my_items, List *listSpeeds, List *listDebug, int counters[])
 {
 	int c = 0;
 	ITEM *cur_item = NULL;
@@ -114,31 +116,52 @@ void eventLoop(MENU *my_menu, WINDOW *my_menu_win, List *listSpeeds, List *listD
 			case 'j':
 			{
 				cur_item = current_item(my_menu);
-				p toggleDown = item_userptr(cur_item);
-				toggleDown(cur_item, DOWN, &listSpeeds, &listDebug, counters);
+				if (item_index(cur_item) < 9) {
+					toggleValue(cur_item, DOWN, &listSpeeds, &listDebug, counters);
+				}
 				//	This updates the item description on the screen
 				// 	Not sure how to do it otherwise
 				menu_driver(my_menu, REQ_DOWN_ITEM);
 				menu_driver(my_menu, REQ_UP_ITEM);
 			}
 				break;
-			case KEY_DOWN:
-				menu_driver(my_menu, REQ_DOWN_ITEM);
-				break;
+
 			case 'k':
-			{	cur_item = current_item(my_menu);
-				p toggleUp = item_userptr(cur_item);
-				toggleUp(cur_item, UP, &listSpeeds, &listDebug, counters);
+			{	
+				cur_item = current_item(my_menu);
+				if (item_index(cur_item) < 9) {
+					toggleValue(cur_item, UP, &listSpeeds, &listDebug, counters);
+				}
 				menu_driver(my_menu, REQ_DOWN_ITEM);
 				menu_driver(my_menu, REQ_UP_ITEM);
 			}
 				break;
+
+			case KEY_DOWN:
+				menu_driver(my_menu, REQ_DOWN_ITEM);
+				break;
+
 			case KEY_UP:
 				menu_driver(my_menu, REQ_UP_ITEM);
 				break;
-		}
+
+			case ENTER:
+			{
+				int index = item_index(current_item(my_menu));
+				if (index == 9) {
+					updateUnitsDisplay(my_items, counters);
+					//	Iterate over every menu item to update their displayed value
+					for (size_t i = 0; i < 10; i++) {
+						menu_driver(my_menu, REQ_UP_ITEM);
+					}
+				} else if (index == 10) {
+					return;
+				}
+			}
+		} // end switch
+
 		wrefresh(my_menu_win);
-	}
+	} // end while
 }
 
 void quitMenu(MENU *my_menu, ITEM **my_items, List *listSpeeds, List *listDebug)
@@ -189,16 +212,12 @@ void fillItems(ITEM **my_items, int counters[], List *listSpeeds, List *listDebu
 		char buffer[10];
 		sprintf(buffer, "%d", counters[i]);
 		my_items[i] = new_item(choices[i], convertToHeapString(buffer));
-		set_item_userptr(my_items[i], toggleValue);
 	}
 
 	my_items[7] = new_item(choices[7], convertToHeapString(listSpeeds->value));
-	set_item_userptr(my_items[7], toggleValue);
-
 	my_items[8] = new_item(choices[8], convertToHeapString(listDebug->value));
-	set_item_userptr(my_items[8], toggleValue);
-
 	my_items[9] = new_item(choices[9], NULL);
+	my_items[10] = new_item(choices[10], NULL);
 }
 
 char * convertToHeapString(char *string)
@@ -213,13 +232,24 @@ char * convertToHeapString(char *string)
 	return heapString;
 }
 
-void updateUnits(int counter[])
+void updateUnits(int counters[])
 {
-	counter[DOCC] = (counter[XC] * counter[YC] * 0.01) + 1;
-	counter[INFC] = (counter[XC] * counter[YC] * 0.005) + 1;
-	counter[SOLC] = (counter[XC] * counter[YC] * 0.02) + 1;
-	counter[NURC] = (counter[XC] * counter[YC] * 0.05) + 1;
-	counter[WOODC] = (counter[XC] * counter[YC] * 0.5);
+	counters[DOCC] = (counters[XC] * counters[YC] * 0.01) + 1;
+	counters[INFC] = (counters[XC] * counters[YC] * 0.005) + 1;
+	counters[SOLC] = (counters[XC] * counters[YC] * 0.02) + 1;
+	counters[NURC] = (counters[XC] * counters[YC] * 0.05) + 1;
+	counters[WOODC] = (counters[XC] * counters[YC] * 0.5);
+}
+
+void updateUnitsDisplay(ITEM **items, int counters[])
+{
+	char buffer[10];
+	updateUnits(counters);
+
+	for (size_t i = 0; i <= WOODC; i++) {
+		sprintf(buffer, "%d", counters[i]);
+		set_item_description(items[i], convertToHeapString(buffer));
+	}
 }
 
 void set_item_description (ITEM *item, const char *description)

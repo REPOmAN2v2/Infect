@@ -6,12 +6,10 @@
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 #define ENTER 	10
-#define DEFAULT	-1
 
 enum {DOWN = -1, UP = 1};
 typedef enum _counters {XC, YC, DOCC, INFC, NURC, SOLC, WOODC} Counters;
 
-typedef void (*p)(void *, int, void *, void *, int []);
 typedef struct _list List;
 
 struct _list {
@@ -21,11 +19,12 @@ struct _list {
 };
 
 void displayMenu();
-void eventLoop(MENU *, WINDOW *, List *, List *, int []);
+void eventLoop(MENU *, WINDOW *, ITEM **, List *, List *, int []);
 List * createList(char *strings[]);
 void freeList(List **);
 void quitMenu(MENU *, ITEM **, List *, List *);
 void updateUnits(int counter[]);
+void updateUnitsDisplay(ITEM **, int []);
 void fillItems(ITEM **, int [], List *, List *);
 char * convertToHeapString(char *string);
 void print_in_middle(WINDOW *, int, int, int, char *, chtype);
