@@ -1,9 +1,32 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * This simply deals with circular linked lists. The code is currently not 
+ * portable since the node values are implementation specific.
+ */
+
 #include "list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-List * createCircularLinkedList(char *strings[])
+/*
+ * createCircularLinkedList() creates a circular linked list from an array of
+ * of strings.
+ *
+ * It takes in as a parameter an array of strings and fills each node's value
+ * by duplicating the strings in the array. It returns a pointer to the root 
+ * node.
+ *
+ * Freeing the values and the nodes is left to the caller, by calling 
+ * freeCircularLinkedList().
+ * 
+ * Remark: createCircularLinkedList() needs to be called by casting the two 
+ * lists with (const char * const *) to squash a harmless (in this case) 
+ * warning from GCC.
+ * See http://c-faq.com/ansi/constmismatch.html
+ */
+List * createCircularLinkedList(const char * const strings[])
 {
 	List *node = malloc(sizeof(List));
 	List *root;
@@ -37,6 +60,13 @@ List * createCircularLinkedList(char *strings[])
 	return root;
 }
 
+/*
+ * freeCircularLinkedList() frees a circular linked list with a heap allocated
+ * value.
+ *
+ * It takes in as a parameter a double pointer to a list node then frees every 
+ * node and their value.
+ */
 void freeCircularLinkedList(List **list)
 {
 	if (list && *list) {

@@ -1,3 +1,12 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * The gist of these functions is to iterate over the board, check the unit,
+ * get a random direction, roll a dice and execute an action according to the
+ * result. The implementation is mostly trivial since it's a lot of for loops,
+ * if/else statements and switches.
+ */
+
 #include "gameplay.h"
 
 /*
@@ -11,20 +20,31 @@
  * Internal prototypes
  */
 
-typedef void (*action)(Board*, Board*);
+typedef void (*action)(Board* const, Board* const);
 
-static Board * getDelta(Board **board, int y, int x);
-static void checkTarget(Board **board, int y, int x, action getAction);
-static void checkSoldierRadius(Board **board, int y, int x);
-static int canShoot(Board **board, int x, int y);
-static void getActionInf(Board *infected, Board *target);
-static void getActionDoc(Board *doctor, Board *target);
-static void getActionCit(Board *citizen, Board *target);
-static void getActionSol(Board **board, Board *soldier, Board *target, int y, int x);
-static void getActionNurse(Board *nurse, Board *target);
-static int checkOutBounds(Board **board, Directions move, int y, int x);
+static Board * getDelta(Board * const * const board, const int y, const int x);
+static void checkTarget(Board * const * const board, const int y, const int x, action getAction);
+static void checkSoldierRadius(Board * const * const board, const int y, const int x);
+static int canShoot(Board * const * const board, const int x, const int y);
+static void getActionInf(Board * const infected, Board * const target);
+static void getActionDoc(Board * const doctor, Board * const target);
+static void getActionCit(Board * const citizen, Board * const target);
+static void getActionSol(Board * const * const board, Board * const soldier, Board * const target, const int y, const int x);
+static void getActionNurse(Board * const nurse, Board * const target);
+static int checkOutBounds(const Directions move, const int y, const int x);
 
-void getMoves(Board **board)
+/*
+ * getMoves() moves the characters who can move.
+ *
+ * It takes in as a parameter the board array. It then iterates over it, gets a
+ * random direction, checks if the character can move then moves it.
+ *
+ * Remark: getMoves() needs to be called by casting the two lists with 
+ * (Board * const * const) to squash a harmless (in this case) warning
+ * from GCC.
+ * See http://c-faq.com/ansi/constmismatch.html
+ */
+void getMoves(Board * const * const board)
 {
 	for (size_t i = 0; i < gameVar.dim.y; i++) {
 		for (size_t j = 0; j < gameVar.dim.x; j++) {
@@ -35,7 +55,7 @@ void getMoves(Board **board)
 				case SOL:
 				case NUR:
 					board[i][j].direction = rand()%4;
-					if (checkOutBounds(board, board[i][j].direction, i, j)) {
+					if (checkOutBounds(board[i][j].direction, i, j)) {
 						Board *target = getDelta(board, i, j);
 						if (target->character == EMPTY) {
 							target->character = board[i][j].character;
@@ -52,7 +72,18 @@ void getMoves(Board **board)
 	}
 }
 
-void getActions(Board **board) 
+/*
+ * getActions() checks if the unit can execute his action.
+ *
+ * It takes in as a parameter the board array. It then iterates over it, gets a
+ * random direction, checks if the character can do his action then do it.
+ *
+ * Remark: getActions() needs to be called by casting the two lists with 
+ * (Board * const * const) to squash a harmless (in this case) warning
+ * from GCC.
+ * See http://c-faq.com/ansi/constmismatch.html
+ */
+void getActions(Board * const * const board) 
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -72,18 +103,18 @@ void getActions(Board **board)
 					}
 				case INF:
 					for (board[i][j].direction = 0; board[i][j].direction < 4; board[i][j].direction++) {
-						if (checkOutBounds(board, board[i][j].direction, i, j)) { 
+						if (checkOutBounds(board[i][j].direction, i, j)) { 
 							checkTarget(board, i, j, getActionInf);
 						}
 					}
 					break;
 				case DOC:
-					if (checkOutBounds(board, board[i][j].direction, i, j)) {
+					if (checkOutBounds(board[i][j].direction, i, j)) {
 						checkTarget(board, i, j, getActionDoc);	
 					}
 					break;
 				case CIT:
-					if (rand()%100 >= 98 && checkOutBounds(board, board[i][j].direction, i, j)) {
+					if (rand()%100 >= 98 && checkOutBounds(board[i][j].direction, i, j)) {
 						checkTarget(board, i, j, getActionCit);
 					}
 					break;
@@ -91,7 +122,7 @@ void getActions(Board **board)
 					checkSoldierRadius(board, i, j);
 					break;
 				case NUR:
-					if (checkOutBounds(board, board[i][j].direction, i, j)) {
+					if (checkOutBounds(board[i][j].direction, i, j)) {
 						checkTarget(board, i, j, getActionNurse);
 					}
 			}
@@ -99,7 +130,14 @@ void getActions(Board **board)
 	}
 }
 
-Board * getDelta(Board **board, int y, int x)
+/*
+ * getDelta() finds the target according to the direction of the action.
+ *
+ * It takes in as parameters the board array and the original coordinates. 
+ * According to the direction of the action of the original actioner, it finds
+ * the target and returns it.
+ */
+Board * getDelta(Board * const * const board, const int y, const int x)
 {
 	Board *attacker = &board[y][x];
 	Board *target = malloc(sizeof(Board));	
@@ -115,7 +153,14 @@ Board * getDelta(Board **board, int y, int x)
 
 } 
 
-void checkTarget(Board **board, int y, int x, action getAction)
+/*
+ * checkTarget() finds the target and gets the action.
+ *
+ * It takes in as parameters the board array, the original coordinates and a
+ * function pointer to action to execute. After getting the target through
+ * getDelta(), it executes the action using getAction();
+ */
+void checkTarget(Board * const * const board, const int y, const int x, action getAction)
 {
 	Board *target = NULL;
 	
@@ -126,7 +171,13 @@ void checkTarget(Board **board, int y, int x, action getAction)
 	getAction(&board[y][x], target);
 }
 
-void checkSoldierRadius(Board **board, int y, int x)
+/*
+ * checkSoldierRadius() does just that.
+ *
+ * It takes in as parameters the board array, the original coordinates. It then
+ * chooses a random target in a given radius.
+ */
+void checkSoldierRadius(Board * const * const board, const int y, const int x)
 {
 	int r1 = rand()%2, r2 = rand()%3;
 	int xt = x, yt = y;
@@ -150,7 +201,7 @@ void checkSoldierRadius(Board **board, int y, int x)
 	}
 }
 
-void getActionInf(Board *infected,  Board *target)
+void getActionInf(Board * const infected, Board * const target)
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -227,7 +278,7 @@ void getActionInf(Board *infected,  Board *target)
 	}
 }
 
-void getActionDoc(Board *doctor, Board *target)
+void getActionDoc(Board * const doctor, Board * const target)
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -264,7 +315,7 @@ void getActionDoc(Board *doctor, Board *target)
 	times->elapsed = 0;
 }
 
-void getActionCit(Board *citizen, Board *target)
+void getActionCit(Board * const citizen, Board * const target)
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -284,7 +335,7 @@ void getActionCit(Board *citizen, Board *target)
 	}
 }
 
-void getActionSol(Board **board, Board *soldier, Board *target, int y, int x)
+void getActionSol(Board * const * const board, Board *soldier, Board *target, const int y, const int x)
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -328,7 +379,7 @@ void getActionSol(Board **board, Board *soldier, Board *target, int y, int x)
 	}
 }
 
-int canShoot(Board **board, int y, int x)
+int canShoot(Board * const * const board, const int y, const int x)
 {
 	for (int i = y - 2; i < y + 3; i++) {
 		for (int j = x - 3; j < x + 4; j++) {
@@ -343,7 +394,7 @@ int canShoot(Board **board, int y, int x)
 	return 1;
 }
 
-void getActionNurse(Board *nurse, Board *target)
+void getActionNurse(Board * const nurse, Board * const target)
 {
 	Units *units = &gameVar.units;
 
@@ -363,7 +414,7 @@ void getActionNurse(Board *nurse, Board *target)
 	}
 }
 
-int checkOutBounds(Board **board, Directions move, int y, int x)
+int checkOutBounds(const const Directions move, const const int y, const const int x)
 {
 	if (move == NORTH) {		
 		return (y + N >= 0);

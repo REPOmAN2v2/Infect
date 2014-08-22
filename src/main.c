@@ -1,3 +1,11 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * This is our main file and the entry point, the switchboard and the main loop
+ * of the game. Win functions are also included. All of this will probably need
+ * to change.
+ */
+
 #include <time.h>
 #include <string.h>
 
@@ -7,11 +15,11 @@
 #include "gamemenu.h"
 
 static void checkWin(Board **board);
-static void win(Board **board, int);
+static void win(Board **board, const int outcome);
 
 Variables gameVar = {{0}, {79, 20}, {0, 20000, 0, FAST, 0}};
 
-int main (int argc, char **argv) 
+int main (int argc, const char * const * const argv) 
 {
 	srand(time(NULL));
 
@@ -30,13 +38,13 @@ int main (int argc, char **argv)
 	do {
 		if (!(times->days % times->refreshRate)) {
 			clear();
-			displayBoard(board);
+			displayBoard((const Board * const * const)board);
 			refresh();
 			sleep(1);
 		}
 		checkWin(board);
 		getActions(board);
-		getMoves(board);
+		getMoves((Board * const * const) board);
 		++times->days;
 		if (times->steps) {
 			while (getch() != 'n');
@@ -60,9 +68,9 @@ void checkWin(Board **board)
 	}
 }
 	
-void win(Board **board, int outcome)
+void win(Board **board, const int outcome)
 {
-	int pos = displayBoard(board);
+	int pos = displayBoard((const Board * const * const)board);
 	Time *times = &gameVar.time;
 
 	if (outcome == 2) {

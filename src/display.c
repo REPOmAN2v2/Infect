@@ -1,6 +1,17 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * Trivial output functions.
+ */
+
 #include "display.h"
 #include <string.h>
 
+/*
+ * initNcurses() initialises ncurses.
+ *
+ * It's initialised with special keyboard support and a few text colours.
+ */
 void initNcurses()
 {
 	initscr();
@@ -17,7 +28,21 @@ void initNcurses()
 	init_pair(6, COLOR_CYAN, COLOR_GREEN);
 }
 
-int displayBoard(Board **board) 
+/*
+ * displayBoard() displays our game board line by line.
+ *
+ * It takes in as parameter the data structures containing the items values
+ * /descriptions but does not modify them directly. It's a switchboard.
+ *
+ * It return a boolean value depending on the user's desire to quit or play the
+ * game.
+ *
+ * Remark: displayBoard() needs to be called by casting board with 
+ * (const Board * const * const) to squash a harmless (in this case) warning
+ * from GCC.
+ * See http://c-faq.com/ansi/constmismatch.html
+ */
+int displayBoard(const Board * const * const board) 
 {
 	Units *units = &gameVar.units;
 	size_t i;
@@ -78,6 +103,12 @@ int displayBoard(Board **board)
 	return i;
 }
 
+/*
+ * printError() does just that.
+ *
+ * It takes in as a parameter a string to be displayed as the error. It quits
+ * ncurses then prints the string to the console and displays the help.
+ */
 void printError(const char *error)
 {
 	endwin();
@@ -85,6 +116,11 @@ void printError(const char *error)
 	printHelp();
 }
 
+/*
+ * printHelp() does just that.
+ *
+ * The help is displayed then the game exits.
+ */
 void printHelp()
 {
 	fprintf(stdout, "--map/-m <str>\t\tSpecify a file to read from containing a map, incompatible with -x/-y\n");
@@ -99,6 +135,11 @@ void printHelp()
     exit(EXIT_SUCCESS);
 }
 
+/*
+ * printVersion() does just that.
+ *
+ * The version is displayed then the game exits.
+ */
 void printVersion()
 {
 	fprintf(stdout, "Infect 1.1\n");
@@ -108,7 +149,13 @@ void printVersion()
 	exit(EXIT_SUCCESS);
 }
 
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color)
+/*
+ * print_in_middle() prints text in the middle of the terminal.
+ *
+ * It takes in as parameters the starting position as (x,y) coordinates, the
+ * width of the screen, the string to print and the colour to print it in.
+ */
+void print_in_middle(WINDOW *win, const int starty, const int startx, int width, const char *string, const chtype color)
 {
 	int length, x, y;
 	float temp;

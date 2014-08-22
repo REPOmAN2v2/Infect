@@ -1,3 +1,11 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * This header defines the global game variables and useful enums. Every module
+ * affecting or requiring information from the game probably needs to include 
+ * this.
+ */
+
 #ifndef INCLUDE_H_
 #define INCLUDE_H_
 
@@ -5,8 +13,6 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <unistd.h>
-
-#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 
 typedef enum _characters {EMPTY, DEAD, INF, DOC, CIT, SOL, NUR, WALL} Characters;
 typedef enum _speeds {SLOW = 10, FAST = 5, FASTEST = 1} Speeds;

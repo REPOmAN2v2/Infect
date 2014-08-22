@@ -1,3 +1,11 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * These functions deal mainly with argument parsing, file I/O and updating
+ * the game variables and the board. Implementation of each function doesn't
+ * involve anything special.
+ */
+
 #include <string.h>
 #include <ctype.h>
 #include "generation.h"
@@ -7,14 +15,28 @@
  * Internal prototypes
  */
 
-static int checkArg(int i, int argc, char **argv, int *check, int map, int *constant);
+static void checkArg(int i, const int argc, const char * const * const argv, int *check, const int map, int *variable);
 static Board ** getMap(const char *path);
 static Board ** initBoard();
-static void fillBoard(Board **board, int y, const char* line);
-static void defaultBoard(Board **board);
-static void generateCoord(Board **board, const int count, Characters type);
+static void fillBoard(Board * const * const board, const int y, const char * const line);
+static void defaultBoard(Board * const * const board);
+static void generateCoord(Board * const * const board, const int count, const Characters type);
 
-Board ** parseArgs(int argc, char **argv)
+
+/*
+ * parseArgs() parses the command line arguments.
+ *
+ * It takes in as arguments argc and argv and returns a pointer to the board.
+ * Freeing the board is then left to the caller.
+ *
+ * It's a big if/else switchboard parsing argv until it finds an argument
+ * it recognises, which is then checked for a valid value through checkArg().
+ * width of the screen, the string to print and the colour to print it in.
+ *
+ * Those arguments may update the game variables, which are then used to generate
+ * the map.
+ */
+Board ** parseArgs(const int argc, const char * const * const argv)
 {
 	Board **board = NULL;
 	int map = 0, size = 0, bDoctor = 0, bInfected = 0, bSoldier = 0,
@@ -83,7 +105,15 @@ Board ** parseArgs(int argc, char **argv)
 	return board;
 }
 
-int checkArg(int i, int argc, char **argv, int *check, int map, int *constant)
+/*
+ * checkArg() check the value behind the cli arguments.
+ *
+ * It takes in as parameters argv, argc, the index of the argument in argv, two
+ * boolean flags (check and map) as well as the game variable to modify.
+ * 
+ * If the argument is followed by an invalid value, it prints an error and exits.
+ */
+void checkArg(int i, const int argc, const char * const * const argv, int *check, const int map, int *variable)
 {
 	if (i + 1 <= argc - 1) {
 		if (!map) {
@@ -91,9 +121,8 @@ int checkArg(int i, int argc, char **argv, int *check, int map, int *constant)
 			char *end;
 			int val = strtol(argv[i], &end, 10);
 			if (end != NULL && !end[0] && val >= 0) {
-				*constant = val;
+				*variable = val;
 				*check = 1;
-				return 1;
 			} else {
 				printError("Unrecognised option(s)\n");
 			}
@@ -103,6 +132,16 @@ int checkArg(int i, int argc, char **argv, int *check, int map, int *constant)
 	}
 }
 
+/*
+ * getMap() opens a map file.
+ *
+ * It takes in as a parameter the path to the file then opens it and gets its
+ * dimensions. It then iterates over every line and calls fillBoard() to fill
+ * our game board.
+ *
+ * It returns a pointer to our board. Freeing the board is then left to the 
+ * caller.
+ */
 Board ** getMap(const char* path)
 {
 	FILE *map = NULL;
@@ -134,6 +173,12 @@ Board ** getMap(const char* path)
 	return board;
 }
 
+/*
+ * initBoard() allocates memory for our game board.
+ *
+ * It exits if no memory is available, otherwise it returns a pointer to the
+ * board. Freeing the board is then left to the caller.
+ */
 Board ** initBoard()
 {
 	Board **board;
@@ -152,7 +197,14 @@ Board ** initBoard()
 	return board;
 }
 
-void fillBoard(Board **board, int y, const char* line)
+/*
+ * fillBoard() fills our board array from a map file line by line.
+ *
+ * It takes in as parameters the board array, the line number and the line
+ * itself. It then parses the line and depending on the character, sets the
+ * unit at the given coordinates and updates the unit counters.
+ */
+void fillBoard(Board * const * const board, const int y, const char* const line)
 {
 	Units *units = &gameVar.units;
 	for (size_t i = 0; i < gameVar.dim.x; i++) {
@@ -197,6 +249,15 @@ void fillBoard(Board **board, int y, const char* line)
 	}
 }
 
+/*
+ * initDefault() initialises the default map.
+ *
+ * It fills the board with default values through defaultBoard() then generates
+ * random coordinates for the non-citizens, as long as there are any left to
+ * place on the map, through generateCoord().
+ *
+ * It returns a pointer to the board. Freeing the board is then left to the caller.
+ */
 Board **initDefault()
 {
 	Units *units = &gameVar.units;
@@ -218,7 +279,12 @@ Board **initDefault()
 	return board;
 }
 
-void defaultBoard(Board **board)
+/*
+ * defaultBoard() defaults the board array.
+ *
+ * It takes in as a parameter the board, then fills it with default value.
+ */
+void defaultBoard(Board * const * const board)
 {
 	for (size_t i = 0; i < gameVar.dim.y; i++) {
 		for (size_t j = 0; j < gameVar.dim.x; j++) {
@@ -228,7 +294,12 @@ void defaultBoard(Board **board)
 	} 
 }
 
-void generateCoord(Board **board, const int count, Characters type)
+/*
+ * generateCoord() generates random coordinates for special units.
+ *
+ * It takes in as parameters the board, the count of the unit and its type.
+ */
+void generateCoord(Board * const * const board, const int count, const Characters type)
 {
 	int x = 0, y = 0;
 

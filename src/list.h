@@ -1,3 +1,9 @@
+/*
+ * https://github.com/REPOmAN2v2/Infect
+ * 
+ * Header for a custom circular linked list implementation. 
+ */
+
 #ifndef LIST_H_
 #define LIST_H_
 
@@ -9,7 +15,7 @@ struct _list {
 	List *previous;
 };
 
-List * createCircularLinkedList(char *strings[]);
+List * createCircularLinkedList(const char * const strings[]);
 void freeCircularLinkedList(List **list);
 
 #endif
