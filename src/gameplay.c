@@ -57,9 +57,13 @@ void getMoves(Board * const * const board)
 					board[i][j].direction = rand()%4;
 					if (checkOutBounds(board[i][j].direction, i, j)) {
 						Board *target = getDelta(board, i, j);
-						if (target->character == EMPTY) {
+						if ((board[i][j].character == CIT && target->character == INF)
+							|| (board[i][j].character == INF && target->character == CIT)) {
+							break;
+						} else if (target->character != WALL || target->character != DEAD) {
+							Characters tmp = target->character;
 							target->character = board[i][j].character;
-							board[i][j].character = EMPTY;
+							board[i][j].character = tmp;
 						}
 					}
 					break;
