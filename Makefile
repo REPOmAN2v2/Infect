@@ -4,9 +4,17 @@ SRC=./src
 
 CC = gcc
 LDFLAGS = -lmenu -lncurses
-CFLAGS := -Wall -g -std=c11
 
-_HEADERS := display.h generation.h gameplay.h gamemenu.h list.h log.h
+CFLAGS := -Wall -std=c11
+_HEADERS := display.h generation.h gameplay.h gamemenu.h list.h
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -DDEBUG
+_HEADERS += log.h
+else
+CFLAGS += -O3
+endif
+
 _OBJECTS := $(_HEADERS:.h=.o)
 OBJECTS = $(patsubst %,$(ODIR)/%,$(_OBJECTS))
 HEADERS = $(patsubst %,$(SRC)/%,$(_HEADERS))

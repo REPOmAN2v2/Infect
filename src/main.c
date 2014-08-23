@@ -13,7 +13,10 @@
 #include "gameplay.h"
 #include "generation.h"
 #include "gamemenu.h"
-#include "log.h"
+
+#ifdef DEBUG
+	#include "log.h"
+#endif
 
 static void checkWin(Board **board);
 static void win(Board **board, const int outcome);
@@ -48,7 +51,9 @@ int main (int argc, const char * const * const argv)
 			}
 		}
 		checkWin(board);
-		logMsg("Day %d\n", times->days + 1);
+		#ifdef DEBUG
+			logMsg("Day %d\n", times->days + 1);
+		#endif
 		getActions(board);
 		getMoves((Board * const * const) board);
 		++times->days;
