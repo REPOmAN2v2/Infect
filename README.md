@@ -14,7 +14,7 @@ Right now, the game isn't really interactive and is mostly a simulation. You can
 - ```--slow```: refresh the screen every 10 days
 - ```--fast```: refresh the screen every 5 days
 - ```--fastest```: refresh the screen every day
-- ```--debug```: refresh step-by-step by pressing ```n``` on the keyboard
+- ```--steps```: refresh step-by-step by pressing ```n``` on the keyboard
 - ```-m``` or ```--map```: specify the path to a custom map to load it. Incompatible with the following flags.
 - ```-x``` and/or ```-y```: specify the dimensions of the map
 - ```-d```, ```-i```, ```-n```,```-s```, ```-w```: specify the number of doctors, infected, nurses, soldiers and/or wood

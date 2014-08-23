@@ -65,7 +65,7 @@ void checkWin(Board **board)
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
 
-	if (units->infected >= (units->citizens + units->nurses + units->doctors + units->soldiers)*25) {
+	if (units->infected >= (units->citizens + units->nurses + units->doctors + units->soldiers)*15) {
 		win(board, 0);
 	} else if (units->soldiers >= (units->citizens + units->nurses + units->doctors)*1.5 && units->soldiers >= units->infected) {
 		win(board, 3);
