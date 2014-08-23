@@ -41,7 +41,7 @@ static char *choices[] = {
     "Soldiers: ",
     "Wood: ",
     "Speed: ",
-    "Debug: ",
+    "Step-by-step: ",
     "Recalculate units",
     "Play",
     (char *)NULL
@@ -54,7 +54,7 @@ static char *speeds[] = {
 	(char *)NULL
 };
 
-static char *debug[] = {
+static char *steps[] = {
 	"Yes",
 	"No",
 	(char *)NULL
@@ -72,15 +72,15 @@ static WINDOW *my_menu_win = NULL;
  * Internal function prototypes
  */
 
-static int eventLoop(const List ** const listSpeeds, const List ** const listDebug, int counters[]);
-static void quitMenu(List *listSpeeds, List *listDebug);
-static void fillItems(const int counters[], const List * const listSpeeds, const List * const listDebug);
+static int eventLoop(const List ** const listSpeeds, const List ** const listSteps, int counters[]);
+static void quitMenu(List *listSpeeds, List *listSteps);
+static void fillItems(const int counters[], const List * const listSpeeds, const List * const listSteps);
 static char * convertToHeapString(const char *string);
 static void updateUnits(int counters[]);
 static void updateUnitsDisplay(int counters[]);
-static void updateGameVariables(const int counters[], const List * const listSpeeds, const List * const listDebug);
+static void updateGameVariables(const int counters[], const List * const listSpeeds, const List * const listSteps);
 static void set_item_description (ITEM *item, const char *description);
-static void toggleValue(ITEM *item, const int direction, const List ** const listSpeeds, const List ** const listDebug, int counters[]);
+static void toggleValue(ITEM *item, const int direction, const List ** const listSpeeds, const List ** const listSteps, int counters[]);
 static void updateNumericValue(ITEM *item, const int direction, int counters[], const int index);
 
 
@@ -99,8 +99,8 @@ void displayMenu()
 
 	List *listSpeeds = createCircularLinkedList((const char * const *)speeds);
 	listSpeeds = listSpeeds->previous; // Default value is Faster
-	List *listDebug = createCircularLinkedList((const char * const *)debug);
-	listDebug = listDebug->next; // Default value is No
+	List *listSteps = createCircularLinkedList((const char * const *)steps);
+	listSteps = listSteps->next; // Default value is No
 
 	int counters[7];
 	counters[XC] = 79;
@@ -110,7 +110,7 @@ void displayMenu()
 	/* Initialize items */
 	n_choices = ARRAY_SIZE(choices);
 	my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-	fillItems(counters, listSpeeds, listDebug);
+	fillItems(counters, listSpeeds, listSteps);
 
 	/* Initialize curses */
 	initNcurses();
@@ -155,11 +155,11 @@ void displayMenu()
 	mvprintw(LINES - 1, 0, "Enter to select, q to quit");
 	refresh();
 
-	if (eventLoop((const List ** const)&listSpeeds, (const List ** const)&listDebug, counters) == PLAY) {
-		updateGameVariables(counters, listSpeeds, listDebug);
-		quitMenu(listSpeeds, listDebug);
+	if (eventLoop((const List ** const)&listSpeeds, (const List ** const)&listSteps, counters) == PLAY) {
+		updateGameVariables(counters, listSpeeds, listSteps);
+		quitMenu(listSpeeds, listSteps);
 	} else {
-		quitMenu(listSpeeds, listDebug);
+		quitMenu(listSpeeds, listSteps);
 		exit(EXIT_SUCCESS);
 	}
 }
@@ -178,7 +178,7 @@ void displayMenu()
  * from GCC.
  * See http://c-faq.com/ansi/constmismatch.html
  */
-int eventLoop(const List ** const listSpeeds, const List **const listDebug, int counters[])
+int eventLoop(const List ** const listSpeeds, const List **const listSteps, int counters[])
 {
 	int c = 0;
 	ITEM *cur_item = NULL;
@@ -189,7 +189,7 @@ int eventLoop(const List ** const listSpeeds, const List **const listDebug, int 
 			case 'j': {
 				cur_item = current_item(my_menu);
 				if (item_index(cur_item) < 9) {
-					toggleValue(cur_item, DOWN, listSpeeds, listDebug, counters);
+					toggleValue(cur_item, DOWN, listSpeeds, listSteps, counters);
 				}
 				//	This refreshes the item description on the screen
 				// 	Not sure how to do it otherwise
@@ -201,7 +201,7 @@ int eventLoop(const List ** const listSpeeds, const List **const listDebug, int 
 			case 'k': {	
 				cur_item = current_item(my_menu);
 				if (item_index(cur_item) < 9) {
-					toggleValue(cur_item, UP, listSpeeds, listDebug, counters);
+					toggleValue(cur_item, UP, listSpeeds, listSteps, counters);
 				}
 				menu_driver(my_menu, REQ_DOWN_ITEM);
 				menu_driver(my_menu, REQ_UP_ITEM);
@@ -242,11 +242,11 @@ int eventLoop(const List ** const listSpeeds, const List **const listDebug, int 
  * It frees all the memory allocated in displayMenu() and destroys our menu
  * before returning to the command line.
  */
-void quitMenu(List *listSpeeds, List *listDebug)
+void quitMenu(List *listSpeeds, List *listSteps)
 {
 	unpost_menu(my_menu);
 	freeCircularLinkedList(&listSpeeds);
-	freeCircularLinkedList(&listDebug);
+	freeCircularLinkedList(&listSteps);
 	int n_choices = ARRAY_SIZE(choices);
 	for(size_t i = 0; i < n_choices; ++i)
 		free_item(my_items[i]);
@@ -260,7 +260,7 @@ void quitMenu(List *listSpeeds, List *listDebug)
  * It takes in as parameters the data structures containing the items possible
  * descriptions/values, then fills in the item's value using these.
  */
-void fillItems(const int counters[], const List * const listSpeeds, const List * const listDebug)
+void fillItems(const int counters[], const List * const listSpeeds, const List * const listSteps)
 {
 	/* 	
 	 *	You should only pass strings from the heap, global memory or
@@ -281,7 +281,7 @@ void fillItems(const int counters[], const List * const listSpeeds, const List *
 	}
 
 	my_items[7] = new_item(choices[7], convertToHeapString(listSpeeds->value));
-	my_items[8] = new_item(choices[8], convertToHeapString(listDebug->value));
+	my_items[8] = new_item(choices[8], convertToHeapString(listSteps->value));
 	my_items[9] = new_item(choices[9], NULL);
 	my_items[10] = new_item(choices[10], NULL);
 }
@@ -338,7 +338,7 @@ void updateUnitsDisplay(int counters[])
  * It takes in as parameters the data structures containing the items values
  * /descriptions and updates the game variables using these.
  */
- void updateGameVariables(const int counters[], const List * const listSpeeds, const List * const listDebug)
+ void updateGameVariables(const int counters[], const List * const listSpeeds, const List * const listSteps)
 {
 	Units *units = &gameVar.units;
 	Time *times = &gameVar.time;
@@ -360,7 +360,7 @@ void updateUnitsDisplay(int counters[])
 		times->refreshRate = FASTEST;
 	}
 
-	times->steps = strcmp(listDebug->value, "Yes") == 0 ? 1 : 0;
+	times->steps = strcmp(listSteps->value, "Yes") == 0 ? 1 : 0;
 }
 
 /*
@@ -387,7 +387,7 @@ void set_item_description (ITEM *item, const char *description)
  * the direction, the value of the data structure is changed and this new value
  * is used to update the item's description.
  */
-void toggleValue(ITEM *item, const int direction, const List ** const listSpeeds, const List ** const listDebug, int counters[])
+void toggleValue(ITEM *item, const int direction, const List ** const listSpeeds, const List ** const listSteps, int counters[])
 {
 	int index = item_index(item);
 
@@ -395,8 +395,8 @@ void toggleValue(ITEM *item, const int direction, const List ** const listSpeeds
 		*listSpeeds = direction == UP ? (*listSpeeds)->next : (*listSpeeds)->previous;
 		set_item_description(item, convertToHeapString((*listSpeeds)->value));
 	} else if (index == 8) {
-		*listDebug = direction == UP ? (*listDebug)->next : (*listDebug)->previous;
-		set_item_description(item, convertToHeapString((*listDebug)->value));
+		*listSteps = direction == UP ? (*listSteps)->next : (*listSteps)->previous;
+		set_item_description(item, convertToHeapString((*listSteps)->value));
 	} else {
 		updateNumericValue(item, direction, counters, index);
 	}

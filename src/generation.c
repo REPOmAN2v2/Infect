@@ -77,7 +77,7 @@ Board ** parseArgs(const int argc, const char * const * const argv)
         	gameVar.time.refreshRate = FAST;
         } else if (strcmp(argv[i], "--fastest") == 0) {
         	gameVar.time.refreshRate = FASTEST;
-        } else if (strcmp(argv[i], "--debug") == 0) {
+        } else if (strcmp(argv[i], "--steps") == 0) {
         	gameVar.time.steps = 1;
         }
 	}
