@@ -213,7 +213,7 @@ void getActionInf(Board * const infected, Board * const target)
 	int prob = rand()%100;
 
 	if (rand()%100 >= 95) {
-		if (target->character == CIT && prob >= 95) {
+		if (target->character == CIT && prob >= 75) {
 			--units->citizens;
 			++units->infected;
 
@@ -229,18 +229,18 @@ void getActionInf(Board * const infected, Board * const target)
 				++units->dead;
 
 				target->character = DEAD;
-			} else if (prob < 30) {
+			} else if (prob < 50) {
 				--units->infected;
 				++units->dead;
 
 				infected->character = DEAD;
-			} else if (prob < 60) {
+			} else if (prob < 75) {
 				if (target->character == DOC) --units->doctors;
 				else --units->nurses;
 				++units->infected;
 
 				target->character = INF;
-			} else if (prob < 70) {
+			} else if (prob < 90) {
 				--units->infected;
 				++units->citizens;
 
@@ -288,7 +288,7 @@ void getActionDoc(Board * const doctor, Board * const target)
 	Time *times = &gameVar.time;
 
 	int prob = rand()%100;
-	if (prob < 20) {
+	if (prob < 10) {
 		if (target->character == CIT) {
 			--units->citizens;
 			++units->nurses;
