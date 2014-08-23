@@ -60,7 +60,7 @@ void getMoves(Board * const * const board)
 						if ((board[i][j].character == CIT && target->character == INF)
 							|| (board[i][j].character == INF && target->character == CIT)) {
 							break;
-						} else if (target->character != WALL || target->character != DEAD) {
+						} else if (target->character != WALL && target->character != DEAD) {
 							Characters tmp = target->character;
 							target->character = board[i][j].character;
 							board[i][j].character = tmp;
@@ -213,7 +213,7 @@ void getActionInf(Board * const infected, Board * const target)
 	int prob = rand()%100;
 
 	if (rand()%100 >= 95) {
-		if (target->character == CIT) {
+		if (target->character == CIT && prob >= 95) {
 			--units->citizens;
 			++units->infected;
 

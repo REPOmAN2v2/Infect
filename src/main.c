@@ -40,15 +40,16 @@ int main (int argc, const char * const * const argv)
 			clear();
 			displayBoard((const Board * const * const)board);
 			refresh();
-			sleep(1);
+			if (times->steps) {
+				while (getch() != 'n');
+			} else {
+				sleep(1);
+			}
 		}
 		checkWin(board);
 		getActions(board);
 		getMoves((Board * const * const) board);
 		++times->days;
-		if (times->steps) {
-			while (getch() != 'n');
-		}
 	} while (1);	
 }
 
