@@ -8,6 +8,7 @@
  */
 
 #include "gameplay.h"
+#include "log.h"
 
 /*
  * Internal constants and definitions
@@ -219,13 +220,20 @@ void getActionInf(Board * const infected, Board * const target)
 
 			target->character = INF;
 			times->elapsed = 0;
+			logMsg("Inf converts Cit to Inf\n");
 		} else if (target->character == WALL && prob < 5) {
 			target->character = EMPTY;
 			units->wood += (rand()%25)+1;
+			logMsg("Inf destroys Wall\n");
 		} else if (target->character == DOC || target->character == NUR) {
 			if (prob < 25) {
-				if (target->character == DOC) --units->doctors;
-				else --units->nurses;
+				if (target->character == DOC) {
+					--units->doctors;
+					logMsg("Inf kills Doc\n");
+				} else {
+					--units->nurses;
+					logMsg("Inf kills Nur\n");
+				}
 				++units->dead;
 
 				target->character = DEAD;
@@ -234,9 +242,15 @@ void getActionInf(Board * const infected, Board * const target)
 				++units->dead;
 
 				infected->character = DEAD;
+				logMsg("Inf killed by Doc/Nur\n");
 			} else if (prob < 75) {
-				if (target->character == DOC) --units->doctors;
-				else --units->nurses;
+				if (target->character == DOC) {
+					--units->doctors;
+					logMsg("Inf converts Doc to Inf\n");
+				} else {
+					--units->nurses;
+					logMsg("Inf converts Nur to Inf\n");
+				}
 				++units->infected;
 
 				target->character = INF;
@@ -245,9 +259,15 @@ void getActionInf(Board * const infected, Board * const target)
 				++units->citizens;
 
 				infected->character = CIT;
+				logMsg("Inf cured to Cit\n");
 			} else if (prob < 100) {
-				if (target->character == DOC) --units->doctors;
-				else --units->nurses;
+				if (target->character == DOC) {
+					--units->doctors;
+					logMsg("Inf traded with Doc\n");
+				} else {
+					--units->nurses;
+					logMsg("Inf traded with Nur\n");
+				}
 				--units->infected;
 				units->dead += 2;
 
@@ -260,22 +280,26 @@ void getActionInf(Board * const infected, Board * const target)
 				++units->dead;
 
 				infected->character = DEAD;
+				logMsg("Inf killed by Soldier\n");
 			} else if (prob < 60) {
 				--units->soldiers;
 				++units->dead;
 
 				target->character = INF;
 				infected->character = DEAD;
+				logMsg("Inf dies against Sol but converts him\n");
 			} else if (prob < 90) {
 				--units->soldiers;
 				++units->infected;
 
 				target->character = INF;
+				logMsg("Inf converts Sol to Inf\n");
 			} else {
 				--units->soldiers;
 				++units->dead;
 
 				target->character = DEAD;
+				logMsg("Inf kills Sol\n");
 			}
 		}
 		times->elapsed = 0;
@@ -294,11 +318,13 @@ void getActionDoc(Board * const doctor, Board * const target)
 			++units->nurses;
 
 			target->character = NUR;
+			logMsg("Doc converts Cit to Nur\n");
 		} else if (target->character == NUR) {
 			--units->nurses;
 			++units->doctors;
 
 			target->character = DOC;
+			logMsg("Doc converts Nur to Doc\n");
 		}
 	} else if (target->character == INF) {
 		if (prob < 25) {
@@ -306,6 +332,7 @@ void getActionDoc(Board * const doctor, Board * const target)
 			--units->infected;
 
 			target->character = CIT;
+			logMsg("Doc converts Inf to Cit\n");
 		}
 	} else if (target->character == DEAD) {
 		if (prob == 10) {
@@ -313,6 +340,7 @@ void getActionDoc(Board * const doctor, Board * const target)
 			--units->dead;
 
 			target->character = CIT;
+			logMsg("Doc revives Dead\n");
 		}
 	}
 
@@ -330,11 +358,13 @@ void getActionCit(Board * const citizen, Board * const target)
 		++units->soldiers;
 
 		citizen->character = SOL;
+		logMsg("Cit converts to Sol\n");
 	} else if (prob < 15) {
 		if (target->character == EMPTY && times->days >= 100 && units->wood >= 25) {
 			target->character = WALL;
 			units->wood -= (rand()%25)+1;
 			times->elapsed = 0;
+			logMsg("Cit builds a wall\n");
 		}
 	}
 }
@@ -357,9 +387,15 @@ void getActionSol(Board * const * const board, Board *soldier, Board *target, co
 
 				target->character = DEAD;
 				times->elapsed = 0;
+				logMsg("Sol kills Inf\n");
 			} else if (prob < 2 && (target->character == NUR || target->character == DOC)) {
-				if (target->character == NUR) --units->nurses;
-				else --units->doctors;
+				if (target->character == NUR) {
+					--units->nurses;
+					logMsg("Sol kills Nur\n");
+				} else {
+					--units->doctors;
+					logMsg("Sol kills Doc\n");
+				}
 				++units->dead;
 
 				target->character = DEAD;
@@ -374,11 +410,13 @@ void getActionSol(Board * const * const board, Board *soldier, Board *target, co
 
 				target->character = SOL;
 				times->elapsed = 0;
+				logMsg("Sol converts Cit\n");
 			}
 		} else if (target->character == DEAD) {
 			--units->dead;
 
 			target->character = EMPTY;
+			logMsg("Sol cleans Dead\n");
 		}
 	}
 }
@@ -414,6 +452,7 @@ void getActionNurse(Board * const nurse, Board * const target)
 			++units->citizens;
 
 			target->character = CIT;
+			logMsg("Nur heals Inf\n");
 		}
 	}
 }
