@@ -25,7 +25,8 @@ Press q to quit the current game after it has ended.
 
 ##Issues
 
-The default game isn't amazingly well balanced, but it doesn't matter that much since it's more fun with custom maps and custom arguments. The unit logic might not be acting as it should be, so that needs to be tested and reviewed in the future.
+- Either infected who should be dying don't die sometimes or they appear out of thin air. This results in accurate counters but a disproportionate amount of infected on the screen and needs further testing. It might affect other units too, but I haven't noticed.
+- The unit logic might not be acting as it should be, so that needs to be tested and reviewed in the future. 
 
 ##Version
 
@@ -34,7 +35,7 @@ The default game isn't amazingly well balanced, but it doesn't matter that much 
 ##Installation
 
 - Install ncurses using you package manager or Cygwin on Windows
-- Run ```make```
+- Run ```make``` to get a release build or ```make DEBUG=1``` to get a debug build, which logs to infect.log
 
 ##Technologies
 
