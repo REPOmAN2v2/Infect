@@ -6,7 +6,7 @@ CC = gcc
 LDFLAGS = -lmenu -lncurses
 CFLAGS := -Wall -g -std=c11
 
-_HEADERS := display.h generation.h gameplay.h gamemenu.h list.h
+_HEADERS := display.h generation.h gameplay.h gamemenu.h list.h log.h
 _OBJECTS := $(_HEADERS:.h=.o)
 OBJECTS = $(patsubst %,$(ODIR)/%,$(_OBJECTS))
 HEADERS = $(patsubst %,$(SRC)/%,$(_HEADERS))

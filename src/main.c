@@ -13,6 +13,7 @@
 #include "gameplay.h"
 #include "generation.h"
 #include "gamemenu.h"
+#include "log.h"
 
 static void checkWin(Board **board);
 static void win(Board **board, const int outcome);
@@ -47,6 +48,7 @@ int main (int argc, const char * const * const argv)
 			}
 		}
 		checkWin(board);
+		logMsg("Day %d\n", times->days + 1);
 		getActions(board);
 		getMoves((Board * const * const) board);
 		++times->days;
@@ -84,8 +86,6 @@ void win(Board **board, const int outcome)
 		mvprintw(++pos, 0, "It only took %u days for the world to descend into chaos\n", times->days);
 	}
 
-	//mvprintw(++pos, 0, "Doctors: %u - Infected: %u - Citizens: %u - Nurses: %u - Soldiers: %u - Dead: %u  - Days: %u\n", 
-	//countDoc, countInf, countCit, countNur, countSol, countDea, days);
 	mvprintw(++pos, 0, "Press q to quit\n");
 
 	refresh();
