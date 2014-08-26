@@ -13,6 +13,7 @@
 *.so
 *.so.*
 *.dylib
+*.DS_Store
 
 # Executables
 *.exe
@@ -21,3 +22,9 @@
 *.i*86
 *.x86_64
 *.hex
+
+# Folders
+bin/
+obj/
+test/
+dev/
