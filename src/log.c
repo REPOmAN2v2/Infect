@@ -35,11 +35,6 @@ void logMsg(const char* format, ...)
 		va_end(args);
 	}
 
-	fclose(file);
 	return;
 }
 
-/*void closeLog()
-{
-	fclose(file);
-}*/
