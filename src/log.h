@@ -2,6 +2,5 @@
 #define LOG_H_
 
 void logMsg(const char* message, ...);
-// void closeLog();
 
 #endif
