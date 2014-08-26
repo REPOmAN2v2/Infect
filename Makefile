@@ -5,14 +5,14 @@ SRC=./src
 CC = gcc
 LDFLAGS = -lmenu -lncurses
 
-CFLAGS := -Wall -std=c11
+CFLAGS := -Wall -std=gnu11
 _HEADERS := display.h generation.h gameplay.h gamemenu.h list.h
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -DDEBUG
 _HEADERS += log.h
 else
-CFLAGS += -O3
+CFLAGS += -Ofast -march=native
 endif
 
 _OBJECTS := $(_HEADERS:.h=.o)
