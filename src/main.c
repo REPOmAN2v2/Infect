@@ -21,7 +21,7 @@
 static void checkWin(Board **board);
 static void win(Board **board, const int outcome);
 
-Variables gameVar = {{0}, {79, 20}, {0, 20000, 0, FAST, 0}};
+Variables gameVar = {{0}, {79, 20}, {0, 20000, 0, FAST, 0}, {0.01f, 0.03f, 0.005f, 0.03f, 0.5f}};
 
 int main (int argc, const char * const * const argv) 
 {

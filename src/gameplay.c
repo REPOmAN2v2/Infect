@@ -362,7 +362,7 @@ void getActionDoc(Board * const doctor, Board * const target)
 			#endif
 		}
 	} else if (target->character == INF) {
-		if (prob < 25) {
+		if (prob < 50) {
 			++units->citizens;
 			--units->infected;
 

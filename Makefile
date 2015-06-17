@@ -12,7 +12,7 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -DDEBUG
 _HEADERS += log.h
 else
-CFLAGS += -Ofast -march=native
+CFLAGS += -O2 -march=native
 endif
 
 _OBJECTS := $(_HEADERS:.h=.o)

@@ -83,20 +83,22 @@ Board ** parseArgs(const int argc, const char * const * const argv)
 	}
 
 	if (!map) {
+		const Coeffs *coeffs = &gameVar.coeffs;
+
 		if (!bDoctor) {
-			gameVar.units.doctors = (gameVar.dim.x * gameVar.dim.y * 0.01) + 1;
+			gameVar.units.doctors = (gameVar.dim.x * gameVar.dim.y * coeffs->doc) + 1;
 		}
 		if (!bInfected) {
-			gameVar.units.infected = (gameVar.dim.x * gameVar.dim.y * 0.005 ) + 1;
+			gameVar.units.infected = (gameVar.dim.x * gameVar.dim.y * coeffs->inf) + 1;
 		}
 		if (!bSoldier) {
-			gameVar.units.soldiers = (gameVar.dim.x * gameVar.dim.y * 0.02) + 1;
+			gameVar.units.soldiers = (gameVar.dim.x * gameVar.dim.y * coeffs->sol) + 1;
 		}
 		if (!bNurse) {
-			gameVar.units.nurses = (gameVar.dim.x * gameVar.dim.y * 0.05) + 1;
+			gameVar.units.nurses = (gameVar.dim.x * gameVar.dim.y * coeffs->nur) + 1;
 		}
 		if (!bWood) {
-			gameVar.units.wood = (gameVar.dim.x * gameVar.dim.y * 0.5);
+			gameVar.units.wood = (gameVar.dim.x * gameVar.dim.y * coeffs->wood);
 		}
 
 		board = initDefault(); 

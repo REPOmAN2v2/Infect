@@ -309,11 +309,12 @@ char * convertToHeapString(const char *string)
  */
 void updateUnits(int counters[])
 {
-	counters[DOCC] = (counters[XC] * counters[YC] * 0.01) + 1;
-	counters[INFC] = (counters[XC] * counters[YC] * 0.005) + 1;
-	counters[SOLC] = (counters[XC] * counters[YC] * 0.02) + 1;
-	counters[NURC] = (counters[XC] * counters[YC] * 0.05) + 1;
-	counters[WOODC] = (counters[XC] * counters[YC] * 0.5);
+	const Coeffs *coeffs = &gameVar.coeffs;
+	counters[DOCC] = (counters[XC] * counters[YC] * coeffs->doc) + 1;
+	counters[INFC] = (counters[XC] * counters[YC] * coeffs->inf) + 1;
+	counters[SOLC] = (counters[XC] * counters[YC] * coeffs->sol) + 1;
+	counters[NURC] = (counters[XC] * counters[YC] * coeffs->nur) + 1;
+	counters[WOODC] = (counters[XC] * counters[YC] * coeffs->wood);
 }
 
 /*

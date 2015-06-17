@@ -38,6 +38,14 @@ typedef struct _dimensions {
 	int y;
 } Dimensions;
 
+typedef struct _coeffs {
+	const float doc;
+	const float nur;
+	const float inf;
+	const float sol;
+	const float wood;
+} Coeffs;
+
 typedef struct _time {
 	int elapsed;
 	const int timeout;
@@ -50,6 +58,7 @@ typedef struct _variables {
 	Units units;
 	Dimensions dim;
 	Time time;
+	const Coeffs coeffs;
 } Variables;
 
 extern Variables gameVar;
