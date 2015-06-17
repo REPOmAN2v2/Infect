@@ -1,42 +1,42 @@
-ODIR=./obj
-BDIR=./bin
-SRC=./src
+PACKAGE = infect
+VERSION = 2.0
+DATE = $(shell date "+%b%y")
 
-CC = gcc
-LDFLAGS = -lmenu -lncurses
+EXE = $(PACKAGE)
 
-CFLAGS := -Wall -std=gnu11
-_HEADERS := display.h generation.h gameplay.h gamemenu.h list.h
-
+DEBUG ?= 1
 ifeq ($(DEBUG), 1)
-CFLAGS += -g -DDEBUG
-_HEADERS += log.h
+	CXXFLAGS = -Wall -Wextra -g
 else
-CFLAGS += -O2 -march=native
+	CXXFLAGS = -02 -march=native
 endif
 
-_OBJECTS := $(_HEADERS:.h=.o)
-OBJECTS = $(patsubst %,$(ODIR)/%,$(_OBJECTS))
-HEADERS = $(patsubst %,$(SRC)/%,$(_HEADERS))
+LDFLAGS = -lmenu -lncurses
+INCLUDES = -I"src/"
 
-default: infect
+CXXFILES = $(shell find src -type f -name '*.cpp')
+OBJECTS = $(CXXFILES:.cpp=.o)
 
-build:
-	@test -d $(ODIR) || mkdir $(ODIR)
-	@test -d $(BDIR) || mkdir $(BDIR)
+DEFINES = -DVERSION=\""$(VERSION)"\" \
+		  -DPACKAGE=\""$(PACKAGE)"\" \
+		  -DDATE=\""$(DATE)"\"
+
+all: dirs $(EXE)
+
+run: all
+	./bin/$(EXE)
+
+dirs: 
+	@test -d bin || mkdir bin
+
+$(EXE): $(OBJECTS)
+	$(CXX) $(OBJECTS) -o bin/$(EXE) $(LDFLAGS)
+
+src/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@ $(DEFINES) $(INCLUDES)
 
 clean:
-	rm -rf ./obj/
-	rm -rf ./bin/
-	rm -f ./*~
-	rm -f ./*.swp
-
-rebuild: clean default
-
-infect: ${OBJECTS} $(SRC)/include.h
-	${CC} $^ $(SRC)/main.c $(LDFLAGS) $(CFLAGS) -o $(BDIR)/$@
-
-$(ODIR)/%.o: $(SRC)/%.c $(SRC)/%.h $(SRC)/include.h build
-	${CC} $< -c $(CFLAGS) $(LDFLAGS) -o $@
+	rm -f $(OBJECTS)
+	rm -f bin/$(EXE)
 
 .PHONY: default clean check dist distcheck install rebuild uninstall
