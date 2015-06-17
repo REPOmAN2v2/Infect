@@ -6,9 +6,9 @@ EXE = $(PACKAGE)
 
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
-	CXXFLAGS = -Wall -Wextra -g
+	CXXFLAGS = -Wall -Wextra -g -std=c++11
 else
-	CXXFLAGS = -02 -march=native
+	CXXFLAGS = -02 -march=native -std=c++11
 endif
 
 LDFLAGS = -lmenu -lncurses

@@ -1,11 +1,24 @@
 #include "window.hpp"
 
-Window::Window(int x, int y, int w, int h):_x(x),_y(y),_w(w),_h(h)
+Window::Window(int h, int w, int y, int x):_h(h),_w(w),_y(y),_x(x)
 {
 	win = newwin(h, w, y, x);
 }
 
-void Window::resize(int w, int h)
+Window::Window(Window *parent, int h, int w, int y, int x)
+{
+	if (w == -1) {
+		_w = parent->_w; 
+	}
+
+	if (h == -1) {
+		_h = parent->_h;
+	}
+
+	win = derwin(parent->win, _h, _w, y, x);
+}
+
+void Window::resize(int h, int w)
 {
 	wresize(win, h, w);
 	_w = w;
@@ -20,4 +33,11 @@ void Window::refresh()
 void Window::clear()
 {
 	werase(win);
+}
+
+void Window::print(std::string line, int y, int x)
+{
+	if (!line.empty()) {
+		mvwaddstr(win, y, x, line.c_str());
+	}
 }
