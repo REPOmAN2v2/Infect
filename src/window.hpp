@@ -15,6 +15,10 @@ public:
 	void clear();
 	void setTitle();
 	void print(std::string line, int y, int x);
+	int getH(){return _h;};
+	int getW(){return _w;};
+	int getY(){return _y;};
+	int getX(){return _x;};
 private:
 	WINDOW *win;
 	int _h, _w, _y, _x;

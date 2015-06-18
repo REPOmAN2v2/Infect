@@ -9,6 +9,11 @@ bool Ncurses::init()
 	keypad(stdscr, TRUE);
 	nodelay(stdscr, TRUE);
 	curs_set(0);
+	start_color();
+
+	for (int i = COLOR_BLACK; i <= COLOR_WHITE; ++i) {
+		init_pair(i, i, -1);
+	}
 
 	return true; // TODO: error handling
 }

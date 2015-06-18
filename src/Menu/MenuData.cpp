@@ -1,6 +1,6 @@
-#include "menu.hpp"
+#include "MenuData.hpp"
 
-Menu::Menu(int h, int w, int y, int x):
+MenuData::MenuData(int h, int w, int y, int x):
 	_h(h),
 	_w(w),
 	_y(y),
@@ -9,7 +9,7 @@ Menu::Menu(int h, int w, int y, int x):
 	index(0)
 {}
 
-Menu::~Menu()
+MenuData::~MenuData()
 {
 	for (size_t i = 0; i < items.size(); ++i) {
 		if (items[i]) {
@@ -21,13 +21,12 @@ Menu::~Menu()
 	items.clear();
 }
 
-void Menu::addItem(MenuItem *item)
+void MenuData::addItem(MenuItem *item)
 {
 	items.push_back(item);
 
 	if (items.size() == 1) {
 		current = items.back();
-		index = items.size() - 1;
 	}
 
 	for (size_t i = 0; i < items.size(); ++i) {
@@ -39,7 +38,7 @@ void Menu::addItem(MenuItem *item)
 	}
 }
 
-void Menu::removeItem(int id)
+void MenuData::removeItem(int id)
 {
 	std::vector<MenuItem*>::iterator it = items.begin();
 	for (; it != items.end(); ++it) {
@@ -59,12 +58,12 @@ void Menu::removeItem(int id)
 	}
 }
 
-void Menu::nextItem()
+void MenuData::nextItem()
 {
 	if (items.size() == 0) {
 		return;
 	} else if (items.size() == 1) {
-		current = *(items.begin());
+		current = items.back();
 		index = 0;
 		return;
 	} else if (current == items.back()) {
@@ -83,7 +82,7 @@ void Menu::nextItem()
 	}
 }
 
-void Menu::prevItem()
+void MenuData::prevItem()
 {
 	if (items.size() == 0) {
 		return;
@@ -106,7 +105,7 @@ void Menu::prevItem()
 	}
 }
 
-void Menu::firstItem()
+void MenuData::firstItem()
 {
 	if (items.size() == 0) {
 		return;
@@ -124,7 +123,7 @@ void Menu::firstItem()
 	}
 }
 
-void Menu::lastItem()
+void MenuData::lastItem()
 {
 	if (items.size() == 0) {
 		return;
@@ -142,7 +141,7 @@ void Menu::lastItem()
 	}
 }
 
-void Menu::draw(Window *window)
+void MenuData::draw(Window *window)
 {
 	size_t begin = 0;
 	size_t end = items.size();
@@ -158,7 +157,25 @@ void Menu::draw(Window *window)
 		}
 	}
 
-	/*for (size_t i = begin, dy = 0; i < end; ++i, ++dy) {
-		if ((i == begin) && (i != 0))
-	}*/
+	for (size_t i = begin, dy = 0; i < end; ++i, ++dy) {
+		if ((i == begin) && (i != 0)) {
+			window->print("(more)",
+						  _x + _w/2 - 3, // center the text
+						  _y + dy);
+			continue;
+		} else if ((i == end - 1) && (i != items.size() - 1)) {
+			window->print("(more)",
+						  _x + _w/2 - 3,
+						  _y + dy + 1);
+			continue;
+		} else if (!items[i]) {
+			std::string line;
+			line.append(_w, '-');
+			window->print(line,
+						  _x + _w/2 - line.size()/2,
+						  _y + dy);
+		} else {
+			items[i]->draw(window, _w, _y + dy, _x);
+		}
+	}
 }

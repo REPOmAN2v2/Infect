@@ -4,11 +4,11 @@
 #include "MenuItem.hpp"
 #include <vector>
 
-class Menu 
+class MenuData
 {
 public:
-	Menu(int h, int w, int y, int x);
-	~Menu();
+	MenuData(int h, int w, int y, int x);
+	~MenuData();
 	void addItem(MenuItem *item);
 	void removeItem(int id);
 	void draw(Window *window);

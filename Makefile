@@ -11,7 +11,7 @@ else
 	CXXFLAGS = -02 -march=native -std=c++11
 endif
 
-LDFLAGS = -lmenu -lncurses
+LDFLAGS = -lncurses
 INCLUDES = -I"src/"
 
 CXXFILES = $(shell find src -type f -name '*.cpp')
