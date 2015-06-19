@@ -2,6 +2,7 @@
 
 #include "MenuStyle.hpp"
 #include "MenuData.hpp"
+#include "MenuItemTemplates.hpp"
 
 class Menu
 {
@@ -12,6 +13,7 @@ public:
 	void draw();
 	void update();
 private:
+	void createMenu(std::vector<MenuItemTemplate> &itemTemplate);
 	MenuStyle *style;
 	MenuData *data;
 };
