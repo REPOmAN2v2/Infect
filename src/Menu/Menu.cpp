@@ -1,6 +1,33 @@
 #include "Menu.hpp"
 
-enum Options {PLAY, SETTINGS, HELP, QUIT};
+struct MainMenu {
+	const char *name;
+	enum ID {
+		ZERO,
+		PLAY,
+		SETTINGS, 
+		HELP, 
+		QUIT,
+		TEST0,
+		TEST1,
+		TEST2
+	} id;
+	enum Type {
+		NONE,
+		SIMPLE
+	} type;
+};
+
+static struct MainMenu mainMenuItems[] = {
+	{.name = "Play", .id = MainMenu::PLAY, .type = MainMenu::SIMPLE},
+	{.name = "Settings", .id = MainMenu::SETTINGS, .type = MainMenu::SIMPLE},
+	{.name = "Help", .id = MainMenu::HELP, .type = MainMenu::SIMPLE},
+	{.name = "Quit", .id = MainMenu::QUIT, .type = MainMenu::SIMPLE},
+	{.name = nullptr, .id = MainMenu::ZERO, .type = MainMenu::NONE},
+	{.name = "Test0", .id = MainMenu::TEST0, .type = MainMenu::SIMPLE},
+	{.name = "Test1", .id = MainMenu::TEST1, .type = MainMenu::SIMPLE},
+	{.name = "Test2", .id = MainMenu::TEST2, .type = MainMenu::SIMPLE}
+};
 
 Menu::Menu():data(nullptr)
 {
@@ -17,28 +44,17 @@ void Menu::createMainMenu()
 						style->menu->getW() - 2,
 						1,1);
 
-	MenuItem *item = new MenuItem("Play", PLAY);
-	data->addItem(item);
+	size_t sz = sizeof(mainMenuItems) / sizeof(mainMenuItems[0]);
+	MainMenu *end = &mainMenuItems[sz - 1];
 
-	item = new MenuItem("Settings", SETTINGS);
-	data->addItem(item);
-
-	item = new MenuItem("Help", HELP);
-	data->addItem(item);
-
-	data->addItem(nullptr);
-
-	item = new MenuItem("Quit", QUIT);
-	data->addItem(item);
-
-	item = new MenuItem("Test1", QUIT+1);
-	data->addItem(item);
-	item = new MenuItem("Test2", QUIT+2);
-	data->addItem(item);
-	item = new MenuItem("Test3", QUIT+3);
-	data->addItem(item);
-	item = new MenuItem("Test4", QUIT+4);
-	data->addItem(item);
+	for (MainMenu *it = mainMenuItems; it <= end; ++it) {
+		if (it->name) {
+			MenuItem *item = new MenuItem(it->name, it->id);
+			data->addItem(item);
+		} else {
+			data->addItem(nullptr);
+		}
+	}
 }
 
 Menu::~Menu()
