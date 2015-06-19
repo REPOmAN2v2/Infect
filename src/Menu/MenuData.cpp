@@ -160,20 +160,20 @@ void MenuData::draw(Window *window)
 	for (size_t i = begin, dy = 0; i < end; ++i, ++dy) {
 		if ((i == begin) && (i != 0)) {
 			window->print("(more)",
-						  _x + _w/2 - 3, // center the text
-						  _y + dy);
+						  _y + dy,
+						  _x + _w/2 - 3); // center the text
 			continue;
 		} else if ((i == end - 1) && (i != items.size() - 1)) {
 			window->print("(more)",
-						  _x + _w/2 - 3,
-						  _y + dy + 1);
+						  _y + dy,
+						  _x + _w/2 - 3);
 			continue;
 		} else if (!items[i]) {
 			std::string line;
-			line.append(_w, '-');
+			line.append(_w - _x, '-');
 			window->print(line,
-						  _x + _w/2 - line.size()/2,
-						  _y + dy);
+						  _y + dy,
+						  _x);
 		} else {
 			items[i]->draw(window, _w, _y + dy, _x);
 		}

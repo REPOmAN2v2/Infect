@@ -1,7 +1,7 @@
 #include "ncurses.hpp"
 #include "Menu/Menu.hpp"
 
-int main(int argc, char **argv)
+int main()
 {
 	Ncurses::init();
 	Menu menu;

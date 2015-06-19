@@ -14,6 +14,7 @@ public:
 	void refresh();
 	void clear();
 	void setTitle();
+	void setBorders();
 	void print(std::string line, int y, int x);
 	int getH(){return _h;};
 	int getW(){return _w;};

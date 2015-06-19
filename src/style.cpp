@@ -3,24 +3,20 @@
 
 Style::Style(int h, int w)
 {
-	int cur_w, cur_h, y , x;
-	getmaxyx(stdscr, cur_h, cur_w);
+	int y, x;
 
 	if (h == -1) {
-		h = cur_h;
-	} else {
-		y = cur_h/2 - h/2;
+		h = LINES;
 	}
 
 	if (w == -1) {
-		w = cur_w;
-	} else {
-		x = cur_w/2 - w/2;
+		w = COLS;
 	}
 
-	main = new Window(h, w, y, x);
+	y = (LINES - h) / 2;
+	x = (COLS - w) / 2;
 
-	main->refresh();
+	main = new Window(h, w, y, x);
 }
 
 Style::~Style()

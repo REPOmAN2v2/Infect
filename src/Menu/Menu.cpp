@@ -4,7 +4,7 @@ enum Options {PLAY, SETTINGS, HELP, QUIT};
 
 Menu::Menu():data(nullptr)
 {
-	style = new MenuStyle(-1, -1);
+	style = new MenuStyle(20, 79);
 }
 
 void Menu::createMainMenu()

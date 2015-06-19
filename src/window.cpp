@@ -37,8 +37,13 @@ void Window::clear()
 
 void Window::print(std::string line, int y, int x)
 {
-	wattrset(win, COLOR_PAIR(7));
+	//wattrset(win, COLOR_PAIR(7));
 	if (!line.empty()) {
 		mvwaddstr(win, y, x, line.c_str());
 	}
+}
+
+void Window::setBorders()
+{
+	box(win, 0, 0);
 }
