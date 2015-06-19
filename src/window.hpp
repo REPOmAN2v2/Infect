@@ -15,7 +15,7 @@ public:
 	void clear();
 	void setTitle();
 	void setBorders();
-	void print(std::string line, int y, int x);
+	void print(std::string line, int y, int x, short fore, short back);
 	int getH(){return _h;};
 	int getW(){return _w;};
 	int getY(){return _y;};

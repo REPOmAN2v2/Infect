@@ -30,6 +30,15 @@ void Menu::createMainMenu()
 
 	item = new MenuItem("Quit", QUIT);
 	data->addItem(item);
+
+	/*item = new MenuItem("Test1", QUIT+1);
+	data->addItem(item);
+	item = new MenuItem("Test2", QUIT+2);
+	data->addItem(item);
+	item = new MenuItem("Test3", QUIT+3);
+	data->addItem(item);
+	item = new MenuItem("Test4", QUIT+4);
+	data->addItem(item);*/
 }
 
 Menu::~Menu()

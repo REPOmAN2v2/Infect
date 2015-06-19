@@ -35,9 +35,16 @@ void Window::clear()
 	werase(win);
 }
 
-void Window::print(std::string line, int y, int x)
+void Window::print(std::string line, int y, int x, short fore, short back)
 {
-	//wattrset(win, COLOR_PAIR(7));
+	if (fore < 0 || fore > 7 || back < -1 || back > 7) {
+		wattrset(win, COLOR_PAIR(0));
+	} else if (back == -1) {
+		wattrset(win, COLOR_PAIR(65 + fore));
+	} else { 
+		wattrset(win, COLOR_PAIR(fore*8 + 1 + back));
+	}
+
 	if (!line.empty()) {
 		mvwaddstr(win, y, x, line.c_str());
 	}

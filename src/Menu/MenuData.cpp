@@ -161,21 +161,24 @@ void MenuData::draw(Window *window)
 		if ((i == begin) && (i != 0)) {
 			window->print("(more)",
 						  _y + dy,
-						  _x + _w/2 - 3); // center the text
+						  _x + _w/2 - 3,
+						  -1,-1); // center the text
 			continue;
 		} else if ((i == end - 1) && (i != items.size() - 1)) {
 			window->print("(more)",
 						  _y + dy,
-						  _x + _w/2 - 3);
+						  _x + _w/2 - 3,
+						  -1,-1);
 			continue;
 		} else if (!items[i]) {
 			std::string line;
 			line.append(_w - _x, '-');
 			window->print(line,
 						  _y + dy,
-						  _x);
+						  _x,
+						  -1,-1);
 		} else {
-			items[i]->draw(window, _w, _y + dy, _x);
+			items[i]->draw(window, (items[i] == current), _w, _y + dy, _x);
 		}
 	}
 }
