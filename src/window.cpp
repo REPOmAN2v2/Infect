@@ -48,6 +48,8 @@ void Window::print(std::string line, int y, int x, short fore, short back)
 	if (!line.empty()) {
 		mvwaddstr(win, y, x, line.c_str());
 	}
+
+	wattrset(win, A_NORMAL);
 }
 
 void Window::setBorders()
