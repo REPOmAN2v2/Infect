@@ -10,6 +10,7 @@ public:
 	~Menu();
 	void createMainMenu();
 	void draw();
+	void update();
 private:
 	MenuStyle *style;
 	MenuData *data;

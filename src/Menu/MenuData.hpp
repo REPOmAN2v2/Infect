@@ -16,6 +16,7 @@ public:
 	void prevItem();
 	void firstItem();
 	void lastItem();
+	void update();
 private:
 	int _h, _w, _y, _x;
 	std::vector<MenuItem*> items;

@@ -7,6 +7,11 @@ int main()
 	Menu menu;
 	menu.createMainMenu();
 	menu.draw();
-	while (getch() != 'n');
+
+	while (Ncurses::getKey(100) != 'n') {
+		menu.update();
+		menu.draw();
+	}
+
 	Ncurses::exit();
 }

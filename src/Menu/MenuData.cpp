@@ -1,4 +1,5 @@
 #include "MenuData.hpp"
+#include "ncurses.hpp"
 
 MenuData::MenuData(int h, int w, int y, int x):
 	_h(h),
@@ -97,7 +98,7 @@ void MenuData::prevItem()
 		}
 	}
 
-	++index;
+	--index;
 	current = items[index];
 
 	if (!current) {
@@ -180,5 +181,32 @@ void MenuData::draw(Window *window)
 		} else {
 			items[i]->draw(window, (items[i] == current), _w, _y + dy, _x);
 		}
+	}
+}
+
+void MenuData::update()
+{
+	int key = Ncurses::getKey(-1);
+
+	if (key == ERR) {
+		return;
+	}
+
+	switch (key) {
+		case KEY_DOWN:
+			nextItem();
+		break;
+
+		case KEY_UP:
+			prevItem();
+		break;
+
+		case KEY_PPAGE:
+			firstItem();
+		break;
+
+		case KEY_NPAGE:
+			lastItem();
+		break;
 	}
 }

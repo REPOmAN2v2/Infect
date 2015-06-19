@@ -4,5 +4,5 @@ namespace Ncurses
 {
 	bool init();
 	void exit();
-	int getKey():
+	int getKey(int delay);
 }

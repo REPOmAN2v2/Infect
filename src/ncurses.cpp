@@ -43,3 +43,11 @@ void Ncurses::exit()
 	refresh();
 	endwin();
 }
+
+int Ncurses::getKey(int delay)
+{
+	timeout(delay);
+	int c = getch();
+	timeout(0);
+	return c;
+}
