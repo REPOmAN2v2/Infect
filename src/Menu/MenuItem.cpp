@@ -1,6 +1,9 @@
 #include "MenuItem.hpp"
 
-MenuItem::MenuItem(std::string label, ID id):label(label),id(id)
+MenuItem::MenuItem(MenuItemTemplate &tem):
+	id(tem.id),
+	type(tem.type),
+	label(tem.name)
 {}
 
 void MenuItem::draw(Window *window, bool cur, int w, int y, int x)

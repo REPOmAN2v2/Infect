@@ -11,11 +11,11 @@ MenuData::MenuData(int h, int w, int y, int x):
 	index(0)
 {}
 
-MenuData::~MenuData()
+void MenuData::clear()
 {
 	for (size_t i = 0; i < items.size(); ++i) {
 		if (items[i]) {
-			delete(items[i]);
+			delete items[i];
 			items[i] = nullptr;
 		}
 	}
@@ -202,6 +202,13 @@ void MenuData::update()
 
 		case KEY_UP:
 			prevItem();
+		break;
+
+		case KEY_RIGHT: // fallthrough
+		case KEY_LEFT:
+			if (current && current->type == Type::NUMBER) {
+				current->update(key);
+			}
 		break;
 
 		case KEY_PPAGE:

@@ -35,4 +35,5 @@ struct MenuItemTemplate {
 	const char *name;
 	enum ID id;
 	enum Type type;
+	int min, max, start;
 };

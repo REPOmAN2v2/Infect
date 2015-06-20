@@ -7,8 +7,12 @@
 class MenuItem
 {
 public:
-	MenuItem(std::string label, ID id);
-	void draw(Window *window, bool cur, int w, int y, int x);
-	std::string label;
+	MenuItem(MenuItemTemplate &tem);
+	virtual ~MenuItem() {};
+	virtual void draw(Window *window, bool cur, int w, int y, int x);
+	virtual void update(int key) {};
 	ID id;
+	Type type;
+protected:
+	std::string label;
 };
