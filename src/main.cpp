@@ -8,10 +8,10 @@ int main()
 	menu.createMainMenu();
 	menu.draw();
 
-	while (Ncurses::getKey(100) != 'n') {
-		menu.update();
+	while (!menu.update()) {
 		menu.draw();
 	}
 
+	menu.exit();
 	Ncurses::exit();
 }

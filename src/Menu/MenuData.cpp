@@ -7,6 +7,7 @@ MenuData::MenuData(int h, int w, int y, int x):
 	_y(y),
 	_x(x),
 	current(nullptr),
+	selected(nullptr),
 	index(0)
 {}
 
@@ -39,7 +40,7 @@ void MenuData::addItem(MenuItem *item)
 	}
 }
 
-void MenuData::removeItem(int id)
+void MenuData::removeItem(ID id)
 {
 	std::vector<MenuItem*>::iterator it = items.begin();
 	for (; it != items.end(); ++it) {
@@ -192,6 +193,8 @@ void MenuData::update()
 		return;
 	}
 
+	selected = nullptr;
+
 	switch (key) {
 		case KEY_DOWN:
 			nextItem();
@@ -208,5 +211,17 @@ void MenuData::update()
 		case KEY_NPAGE:
 			lastItem();
 		break;
+
+		case '\n':
+			selected = current;
+		break;
+
+		default:
+		break;
 	}
+}
+
+ID MenuData::whichSelected()
+{
+	return selected ? selected->id : ID::NONE;
 }

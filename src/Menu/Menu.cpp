@@ -2,28 +2,29 @@
 #include <vector>
 
 static std::vector<MenuItemTemplate> mainMenuItems = {
-	{.name = "Play", .id = PLAY, .type = Type::SIMPLE},
-	{.name = "Settings", .id = SETTINGS, .type = Type::SIMPLE},
-	{.name = "Help", .id = HELP, .type = Type::SIMPLE},
-	{.name = "Quit", .id = QUIT, .type = Type::SIMPLE},
-	{.name = nullptr, .id = ZERO, .type = Type::NONE},
-	{.name = "Test0", .id = TEST0, .type = Type::SIMPLE},
-	{.name = "Test1", .id = TEST1, .type = Type::SIMPLE},
-	{.name = "Test2", .id = TEST2, .type = Type::SIMPLE}
+	{.name = "Play", .id = ID::PLAYMENU, .type = Type::SIMPLE},
+	{.name = "Settings", .id = ID::SETTINGS, .type = Type::SIMPLE},
+	{.name = "Help", .id = ID::HELP, .type = Type::SIMPLE},
+	{.name = "Quit", .id = ID::QUIT, .type = Type::SIMPLE},
+	{.name = nullptr, .id = ID::NONE, .type = Type::NONE},
+	{.name = "Test0", .id = ID::TEST0, .type = Type::SIMPLE},
+	{.name = "Test1", .id = ID::TEST1, .type = Type::SIMPLE},
+	{.name = "Test2", .id = ID::TEST2, .type = Type::SIMPLE}
 };
 
 static std::vector<MenuItemTemplate> playMenuItems = {
-	{.name = "Launch game", .id = PLAY, .type = Type::SIMPLE},
-	{.name = nullptr, .id = ZERO, .type = Type::NONE},
-	{.name = "Doctors", .id = DOCTORS, .type = Type::NUMBER},
-	{.name = "Infected", .id = INFECTED, .type = Type::NUMBER},
-	{.name = "Nurses", .id = NURSES, .type = Type::NUMBER},
-	{.name = "Soldiers", .id = SOLDIERS, .type = Type::NUMBER},
-	{.name = "Lumber", .id = LUMBER, .type = Type::NUMBER},
-	{.name = nullptr, .id = ZERO, .type = Type::NONE},
-	{.name = "Sim speed", .id = SPEED, .type = Type::TEXT},
-	{.name = "Step", .id = STEP, .type = Type::TOGGLE},
-	{.name = "Reset", .id = RESET, .type = Type::SIMPLE}
+	{.name = "Launch game", .id = ID::PLAY, .type = Type::SIMPLE},
+	{.name = "Back", .id = ID::BACK, .type = Type::SIMPLE},
+	{.name = nullptr, .id = ID::NONE, .type = Type::NONE},
+	{.name = "Doctors", .id = ID::DOCTORS, .type = Type::NUMBER},
+	{.name = "Infected", .id = ID::INFECTED, .type = Type::NUMBER},
+	{.name = "Nurses", .id = ID::NURSES, .type = Type::NUMBER},
+	{.name = "Soldiers", .id = ID::SOLDIERS, .type = Type::NUMBER},
+	{.name = "Lumber", .id = ID::LUMBER, .type = Type::NUMBER},
+	{.name = nullptr, .id = ID::NONE, .type = Type::NONE},
+	{.name = "Sim speed", .id = ID::SPEED, .type = Type::TEXT},
+	{.name = "Step", .id = ID::STEP, .type = Type::TOGGLE},
+	{.name = "Reset", .id = ID::RESET, .type = Type::SIMPLE}
 };
 
 Menu::Menu():data(nullptr)
@@ -58,12 +59,17 @@ void Menu::createMenu(std::vector<MenuItemTemplate> &itemTemplate)
 
 Menu::~Menu()
 {
-	if (style) {
-		delete style;
-	}
+	exit();
+}
 
+void Menu::exit()
+{
 	if (data) {
 		delete data;
+	}
+
+	if (style) {
+		delete style;
 	}
 }
 
@@ -72,7 +78,26 @@ void Menu::draw()
 	style->draw(data);
 }
 
-void Menu::update()
+bool Menu::update()
 {
 	data->update();
+	// TODO: "optimise" to jump table
+	switch (data->whichSelected()) {
+		case ID::QUIT:
+			return true;
+		break;
+
+		case ID::PLAYMENU:
+			createMenu(playMenuItems);
+		break;
+
+		case ID::BACK:
+			createMenu(mainMenuItems);
+		break;
+
+		default:
+		break;
+	} 
+
+	return false;
 }

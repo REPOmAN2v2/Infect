@@ -11,7 +11,8 @@ public:
 	~Menu();
 	void createMainMenu();
 	void draw();
-	void update();
+	bool update();
+	void exit();
 private:
 	void createMenu(std::vector<MenuItemTemplate> &itemTemplate);
 	MenuStyle *style;

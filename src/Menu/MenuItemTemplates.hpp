@@ -8,10 +8,11 @@ enum class Type {
 	TOGGLE
 }; 
 
-enum ID {
-	ZERO,
-	PLAY,
+enum class ID {
+	NONE,
+	BACK,
 	//specific to the main menu
+	PLAYMENU,
 	SETTINGS, 
 	HELP, 
 	QUIT,
@@ -19,6 +20,7 @@ enum ID {
 	TEST1,
 	TEST2,
 	//specific to the play menu
+	PLAY,
 	DOCTORS,
 	INFECTED,
 	NURSES,
