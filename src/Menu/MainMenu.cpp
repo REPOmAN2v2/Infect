@@ -53,7 +53,7 @@ void MainMenu::update()
 
 		case ID::HELP:
 			spawnHelp();
-		default:
+		break;
 
 		default:
 		break;
