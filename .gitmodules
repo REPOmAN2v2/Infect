@@ -1,3 +1,4 @@
 [submodule "Cursed-engine"]
 	path = Cursed-engine
 	url = https://github.com/REPOmAN2v2/Cursed-engine.git
+	branch = master

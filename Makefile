@@ -11,13 +11,13 @@ else
 	CXXFLAGS = -02 -march=native -std=c++11
 endif
 
-LDFLAGS = -lncurses
-INCLUDES = -I"src/"
+LDFLAGS = -lncurses -lconfig++
+INCLUDES = -I"src/" -I"Cursed-engine/"
 
 CXXFILES = $(shell find src -type f -name '*.cpp')
 OBJECTS = $(CXXFILES:.cpp=.o)
 
-ENGINE_DIR = Cursed-engine/src
+ENGINE_DIR = Cursed-engine/engine
 ENGINE_CXXFILES = $(shell find $(ENGINE_DIR) -type f -name '*.cpp')
 ENGINE_OBJECTS = $(ENGINE_CXXFILES:.cpp=.o)
 
