@@ -1,6 +1,7 @@
 #include "MainMenu.hpp"
 #include "PlayMenu.hpp"
 #include "SettingsMenu.hpp"
+#include <engine/Dialog/Dialog.hpp>
 
 MainMenu::MainMenu(Manager &manager):Menu(manager) {};
 
@@ -50,7 +51,19 @@ void MainMenu::update()
 			state = nullptr;
 		break;
 
+		case ID::HELP:
+			spawnHelp();
+		default:
+
 		default:
 		break;
 	}
+}
+
+void MainMenu::spawnHelp()
+{
+	std::string message = "Cursed engine v" VERSION "\n"
+						  "Compiled " DATE "\n"
+						  "https://github.com/REPOmAN2v2/Cursed-engine";
+	Dialog::message(message, std::string("Help"));
 }

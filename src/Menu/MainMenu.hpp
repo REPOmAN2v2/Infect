@@ -9,4 +9,5 @@ public:
 	void load() override;
 private:
 	void saveSettings() override {};
+	void spawnHelp();
 };
