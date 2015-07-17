@@ -1,5 +1,5 @@
 PACKAGE = infect
-VERSION = 2.0
+VERSION = 2.0.2
 DATE = $(shell date "+%b%y")
 
 EXE = $(PACKAGE)
