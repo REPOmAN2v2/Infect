@@ -1,5 +1,6 @@
 #include "PlayMenu.hpp"
 #include "MainMenu.hpp"
+#include "../Game/GameState.hpp"
 
 PlayMenu::PlayMenu(Manager &manager):Menu(manager) {};
 
@@ -48,8 +49,8 @@ void PlayMenu::update()
 
 	switch (data->whichSelected()) {
 		case ID::PLAY:
-			/* State *game = new Game();
-			manager.change(game);*/
+			state = new GameState(manager);
+			manager.change(state);
 		break;
 
 		case ID::BACK:
