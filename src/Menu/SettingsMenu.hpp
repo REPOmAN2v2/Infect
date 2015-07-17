@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/Menu/Menu.hpp>
+#include "MenuItemTemplates.hpp"
 
 class SettingsMenu : public Menu {
 public:

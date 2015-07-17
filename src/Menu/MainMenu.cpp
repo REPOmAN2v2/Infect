@@ -17,13 +17,13 @@ void MainMenu::load()
 						1,1);
 
 	MenuItem *item;
-	item = new MenuItem("Play", ID::PLAYMENU, Type::SIMPLE);
+	item = new MenuItem("Play", ID::PLAYMENU, MenuItem::Type::SIMPLE);
 	data->addItem(item);
-	item = new MenuItem("Settings", ID::SETTINGS, Type::SIMPLE);
+	item = new MenuItem("Settings", ID::SETTINGS, MenuItem::Type::SIMPLE);
 	data->addItem(item);
-	item = new MenuItem("Help", ID::HELP, Type::SIMPLE);
+	item = new MenuItem("Help", ID::HELP, MenuItem::Type::SIMPLE);
 	data->addItem(item);
-	item = new MenuItem("Quit", ID::QUIT, Type::SIMPLE);
+	item = new MenuItem("Quit", ID::QUIT, MenuItem::Type::SIMPLE);
 	data->addItem(item);
 }
 

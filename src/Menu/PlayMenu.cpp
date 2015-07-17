@@ -18,27 +18,27 @@ void PlayMenu::load()
 	static const std::vector<std::string> simSpeed = {"Slow", "Normal", "Fast"};
 
 	MenuItem *item;
-	item = new MenuItem("Launch game", ID::PLAY, Type::SIMPLE);
+	item = new MenuItem("Launch game", ID::PLAY, MenuItem::Type::SIMPLE);
 	data->addItem(item);
-	item = new MenuItem("Back", ID::BACK, Type::SIMPLE);
-	data->addItem(item);
-	data->addItem(nullptr);
-	item = new MenuItemNumber("Doctors", ID::DOCTORS, Type::NUMBER, 0, 100, 5);
-	data->addItem(item);
-	item = new MenuItemNumber("Infected", ID::INFECTED, Type::NUMBER, 0, 100, 8);
-	data->addItem(item);
-	item = new MenuItemNumber("Nurses", ID::NURSES, Type::NUMBER, 0, 100, 6);
-	data->addItem(item);
-	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, Type::NUMBER, 0, 100, 10);
-	data->addItem(item);
-	item = new MenuItemNumber("Lumber", ID::LUMBER, Type::NUMBER, 0, 1000, 50);
+	item = new MenuItem("Back", ID::BACK, MenuItem::Type::SIMPLE);
 	data->addItem(item);
 	data->addItem(nullptr);
-	item = new MenuItemList("Sim speed", ID::SPEED, Type::LIST, simSpeed, "Normal");
+	item = new MenuItemNumber("Doctors", ID::DOCTORS, MenuItem::Type::NUMBER, 0, 100, 5);
 	data->addItem(item);
-	item = new MenuItemToggle("Step", ID::STEP, Type::TOGGLE, false);
+	item = new MenuItemNumber("Infected", ID::INFECTED, MenuItem::Type::NUMBER, 0, 100, 8);
 	data->addItem(item);
-	item = new MenuItem("Reset", ID::RESET, Type::SIMPLE);
+	item = new MenuItemNumber("Nurses", ID::NURSES, MenuItem::Type::NUMBER, 0, 100, 6);
+	data->addItem(item);
+	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, MenuItem::Type::NUMBER, 0, 100, 10);
+	data->addItem(item);
+	item = new MenuItemNumber("Lumber", ID::LUMBER, MenuItem::Type::NUMBER, 0, 1000, 50);
+	data->addItem(item);
+	data->addItem(nullptr);
+	item = new MenuItemList("Sim speed", ID::SPEED, MenuItem::Type::LIST, simSpeed, "Normal");
+	data->addItem(item);
+	item = new MenuItemToggle("Step", ID::STEP, MenuItem::Type::TOGGLE, false);
+	data->addItem(item);
+	item = new MenuItem("Reset", ID::RESET, MenuItem::Type::SIMPLE);
 	data->addItem(item);
 }
 
