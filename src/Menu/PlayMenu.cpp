@@ -1,6 +1,7 @@
 #include "PlayMenu.hpp"
 #include "MainMenu.hpp"
 #include "../Game/GameState.hpp"
+#include "../Config/GameGlobals.hpp"
 
 PlayMenu::PlayMenu(Manager &manager):Menu(manager) {};
 

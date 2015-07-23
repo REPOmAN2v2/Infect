@@ -8,7 +8,7 @@ DEBUG ?= 1
 ifeq ($(DEBUG), 1)
 	CXXFLAGS = -Wall -Wextra -g -std=c++11
 else
-	CXXFLAGS = -02 -march=native -std=c++11
+	CXXFLAGS = -O2 -march=native -std=c++11
 endif
 
 LDFLAGS = -lncurses -lconfig++

@@ -2,10 +2,12 @@
 #include <engine/State/Manager.hpp>
 #include <Menu/MainMenu.hpp>
 #include <engine/Config/Globals.hpp>
+#include "Config/GameGlobals.hpp"
 
 int main()
 {
-	Globals::load();	
+	Globals::load();
+	GameGlobals::load();
 	Ncurses::init();
 
 	Manager manager;
@@ -16,4 +18,5 @@ int main()
 	
 	Ncurses::exit();
 	Globals::save();
+	GameGlobals::save();
 }
