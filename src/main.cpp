@@ -17,6 +17,6 @@ int main()
 	manager.loop();
 	
 	Ncurses::exit();
-	Globals::save();
-	GameGlobals::save();
+	//Globals::save();
+	//GameGlobals::save();
 }

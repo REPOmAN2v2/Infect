@@ -2,6 +2,7 @@
 #include "MainMenu.hpp"
 #include "../Game/GameState.hpp"
 #include "../Config/GameGlobals.hpp"
+#include <engine/Dialog/Dialog.hpp>
 
 PlayMenu::PlayMenu(Manager &manager):Menu(manager) {};
 
@@ -24,20 +25,20 @@ void PlayMenu::load()
 	item = new MenuItem("Back", ID::BACK, MenuItem::Type::SIMPLE);
 	data->addItem(item);
 	data->addItem(nullptr);
-	item = new MenuItemNumber("Doctors", ID::DOCTORS, MenuItem::Type::NUMBER, 0, 100, 5);
+	item = new MenuItemNumber("Doctors", ID::DOCTORS, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::doctors);
 	data->addItem(item);
-	item = new MenuItemNumber("Infected", ID::INFECTED, MenuItem::Type::NUMBER, 0, 100, 8);
+	item = new MenuItemNumber("Infected", ID::INFECTED, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::infected);
 	data->addItem(item);
-	item = new MenuItemNumber("Nurses", ID::NURSES, MenuItem::Type::NUMBER, 0, 100, 6);
+	item = new MenuItemNumber("Nurses", ID::NURSES, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::nurses);
 	data->addItem(item);
-	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, MenuItem::Type::NUMBER, 0, 100, 10);
+	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::soldiers);
 	data->addItem(item);
-	item = new MenuItemNumber("Lumber", ID::LUMBER, MenuItem::Type::NUMBER, 0, 1000, 50);
+	item = new MenuItemNumber("Lumber", ID::LUMBER, MenuItem::Type::NUMBER, 0, 1000, GameGlobals::Constants::lumber);
 	data->addItem(item);
 	data->addItem(nullptr);
-	item = new MenuItemList("Sim speed", ID::SPEED, MenuItem::Type::LIST, simSpeed, "Normal");
+	item = new MenuItemList("Sim speed", ID::SPEED, MenuItem::Type::LIST, simSpeed, GameGlobals::Settings::speed);
 	data->addItem(item);
-	item = new MenuItemToggle("Step", ID::STEP, MenuItem::Type::TOGGLE, false);
+	item = new MenuItemToggle("Step", ID::STEP, MenuItem::Type::TOGGLE, GameGlobals::Settings::step);
 	data->addItem(item);
 	item = new MenuItem("Reset", ID::RESET, MenuItem::Type::SIMPLE);
 	data->addItem(item);
@@ -55,7 +56,10 @@ void PlayMenu::update()
 		break;
 
 		case ID::BACK:
-			saveSettings();
+			if (Dialog::prompt(std::string("Do you want to save?"), std::string("Save game settings"))) {
+				saveSettings();
+			}
+
 			state = new MainMenu(manager);
 			changeMenu(state);
 			state = nullptr;
@@ -75,5 +79,11 @@ void PlayMenu::update()
 
 void PlayMenu::saveSettings()
 {
-	// empty for now
+	GameGlobals::Constants::doctors = data->get<int>(ID::DOCTORS);
+	GameGlobals::Constants::nurses = data->get<int>(ID::NURSES);
+	GameGlobals::Constants::infected = data->get<int>(ID::INFECTED);
+	GameGlobals::Constants::soldiers = data->get<int>(ID::SOLDIERS);
+	GameGlobals::Constants::lumber = data->get<int>(ID::LUMBER);
+	GameGlobals::Settings::speed = data->get<std::string>(ID::SPEED);
+	GameGlobals::Settings::step = data->get<bool>(ID::STEP);
 }
