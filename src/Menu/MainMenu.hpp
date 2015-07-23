@@ -2,8 +2,6 @@
 
 #include <engine/Menu/Menu.hpp>
 
-#include "MenuItemTemplates.hpp"
-
 class Manager;
 
 class MainMenu : public Menu {

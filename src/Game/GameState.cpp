@@ -1,4 +1,4 @@
-#include <engine/Dialog/Dialog.hpp>
+#include <engine/Dialog/Dialog.hpp> // for Dialog::message(2)
 #include <string>
 
 #include "../Menu/MainMenu.hpp"
@@ -6,9 +6,8 @@
 #include "Game/GameStyle.hpp"
 #include "GameState.hpp"
 #include "engine/Menu/../Config/Globals.hpp"
-#include "engine/Menu/Items/../../window.hpp"
+#include "engine/Menu/Items/../../window.hpp" // for Window class (style->game->get<X>(0))
 #include "engine/State/Manager.hpp"
-#include "engine/State/State.hpp"
 
 GameState::GameState(Manager &manager):State(manager),style(nullptr),data(nullptr)
 {

@@ -1,10 +1,7 @@
 #pragma once
 
-#include <engine/style.hpp>
-#include <engine/window.hpp>
 #include <vector>
-
-#include "GameData.hpp"
+#include <engine/style.hpp>
 
 class GameData;
 class Window;

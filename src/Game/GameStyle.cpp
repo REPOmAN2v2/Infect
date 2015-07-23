@@ -1,8 +1,7 @@
-#include <algorithm>
+#include <algorithm> // for std::for_each
 #include <string>
 
 #include "GameStyle.hpp"
-#include "engine/style.hpp"
 #include "engine/window.hpp"
 
 class GameData;

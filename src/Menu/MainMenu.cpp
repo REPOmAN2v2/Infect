@@ -1,16 +1,15 @@
-#include <engine/Dialog/Dialog.hpp>
+#include <engine/Dialog/Dialog.hpp> // for Dialog::message(2)
 #include <string>
 
 #include "MainMenu.hpp"
-#include "Menu/MenuItemTemplates.hpp"
+#include "Menu/MenuItemTemplates.hpp" // for ID namespace
 #include "PlayMenu.hpp"
-#include "SettingsMenu.hpp"
-#include "engine/Menu/../State/Manager.hpp"
-#include "engine/Menu/Items/../../window.hpp"
-#include "engine/Menu/Items/MenuItem.hpp"
-#include "engine/Menu/Menu.hpp"
+#include "SettingsMenu.hpp" 
+#include "engine/State/Manager.hpp"
+#include "engine/window.hpp" // for Window class (style->menu->get<X>(0))
+#include "engine/Menu/Items/MenuItem.hpp" 
 #include "engine/Menu/MenuData.hpp"
-#include "engine/Menu/MenuStyle.hpp"
+#include "engine/Menu/MenuStyle.hpp" 
 
 class State;
 

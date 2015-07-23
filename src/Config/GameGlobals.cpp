@@ -1,5 +1,4 @@
 #include <engine/Config/config.hpp>
-#include <libconfig.h++>
 
 #include "GameGlobals.hpp"
 

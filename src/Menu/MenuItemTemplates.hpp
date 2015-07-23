@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <string>
-
 // this is just to make our life easier
 // enum classes are nice but we want the implicit conversion to interact with the engine easily
 struct ID {

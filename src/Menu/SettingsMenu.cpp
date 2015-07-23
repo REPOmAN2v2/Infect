@@ -1,11 +1,11 @@
-#include <engine/Dialog/Dialog.hpp>
+#include <engine/Dialog/Dialog.hpp> // for Dialog::prompt(2)
 #include <string>
 
 #include "MainMenu.hpp"
-#include "Menu/MenuItemTemplates.hpp"
+#include "Menu/MenuItemTemplates.hpp" // for ID namespace
 #include "SettingsMenu.hpp"
-#include "engine/Menu/../Config/Globals.hpp"
-#include "engine/Menu/Items/../../window.hpp"
+#include "engine/Config/Globals.hpp"
+#include "engine/window.hpp" // for Window class (style->menu->get<X>(0))
 #include "engine/Menu/Items/MenuItem.hpp"
 #include "engine/Menu/Items/MenuItemNumber.hpp"
 #include "engine/Menu/Menu.hpp"

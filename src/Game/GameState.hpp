@@ -1,11 +1,6 @@
 #pragma once
 
-#include <engine/Config/Globals.hpp>
-#include <engine/State/State.hpp>
-
-#include "GameData.hpp"
-#include "GameStyle.hpp"
-#include "engine/Menu/../State/State.hpp"
+#include "engine/State/State.hpp"
 
 class GameData;
 class GameStyle;
