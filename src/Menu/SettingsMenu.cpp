@@ -1,6 +1,19 @@
-#include "SettingsMenu.hpp"
-#include "MainMenu.hpp"
 #include <engine/Dialog/Dialog.hpp>
+#include <string>
+
+#include "MainMenu.hpp"
+#include "Menu/MenuItemTemplates.hpp"
+#include "SettingsMenu.hpp"
+#include "engine/Menu/../Config/Globals.hpp"
+#include "engine/Menu/Items/../../window.hpp"
+#include "engine/Menu/Items/MenuItem.hpp"
+#include "engine/Menu/Items/MenuItemNumber.hpp"
+#include "engine/Menu/Menu.hpp"
+#include "engine/Menu/MenuData.hpp"
+#include "engine/Menu/MenuStyle.hpp"
+
+class Manager;
+class State;
 
 SettingsMenu::SettingsMenu(Manager &manager):Menu(manager) {};
 

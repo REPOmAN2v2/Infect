@@ -1,8 +1,23 @@
-#include "PlayMenu.hpp"
-#include "MainMenu.hpp"
-#include "../Game/GameState.hpp"
-#include "../Config/GameGlobals.hpp"
 #include <engine/Dialog/Dialog.hpp>
+#include <string>
+#include <vector>
+
+#include "../Config/GameGlobals.hpp"
+#include "../Game/GameState.hpp"
+#include "MainMenu.hpp"
+#include "Menu/MenuItemTemplates.hpp"
+#include "PlayMenu.hpp"
+#include "engine/Menu/../State/Manager.hpp"
+#include "engine/Menu/Items/MenuItem.hpp"
+#include "engine/Menu/Items/MenuItemList.hpp"
+#include "engine/Menu/Items/MenuItemNumber.hpp"
+#include "engine/Menu/Items/MenuItemToggle.hpp"
+#include "engine/Menu/Menu.hpp"
+#include "engine/Menu/MenuData.hpp"
+#include "engine/Menu/MenuStyle.hpp"
+#include "engine/window.hpp"
+
+class State;
 
 PlayMenu::PlayMenu(Manager &manager):Menu(manager) {};
 

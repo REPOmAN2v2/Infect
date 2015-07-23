@@ -1,13 +1,19 @@
 #pragma once
 
-#include <engine/State/State.hpp>
 #include <engine/Config/Globals.hpp>
-#include "GameStyle.hpp"
+#include <engine/State/State.hpp>
+
 #include "GameData.hpp"
+#include "GameStyle.hpp"
+#include "engine/Menu/../State/State.hpp"
+
+class GameData;
+class GameStyle;
+class Manager;
 
 class GameState : public State {
 public:
-	GameState(Manager &manager);
+	explicit GameState(Manager &manager);
 	void draw() override;
 	void update() override;
 	void exit() override;

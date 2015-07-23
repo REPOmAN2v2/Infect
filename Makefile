@@ -39,6 +39,9 @@ $(EXE): $(OBJECTS) $(ENGINE_OBJECTS)
 src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@ $(DEFINES) $(INCLUDES)
 
+$(ENGINE_DIR)/%.o: $(ENGINE_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@ $(DEFINES) $(INCLUDES)
+
 clean:
 	rm -f $(OBJECTS) $(ENGINE_OBJECTS)
 	rm -f bin/$(EXE)

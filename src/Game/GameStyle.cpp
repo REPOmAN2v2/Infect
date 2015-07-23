@@ -1,6 +1,11 @@
-#include "GameStyle.hpp"
-#include <engine/Config/Globals.hpp>
 #include <algorithm>
+#include <string>
+
+#include "GameStyle.hpp"
+#include "engine/style.hpp"
+#include "engine/window.hpp"
+
+class GameData;
 
 GameStyle::GameStyle(int h, int w):
 	Style(h, w),

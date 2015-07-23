@@ -1,6 +1,14 @@
-#include "GameState.hpp"
-#include "../Menu/MainMenu.hpp"
 #include <engine/Dialog/Dialog.hpp>
+#include <string>
+
+#include "../Menu/MainMenu.hpp"
+#include "Game/GameData.hpp"
+#include "Game/GameStyle.hpp"
+#include "GameState.hpp"
+#include "engine/Menu/../Config/Globals.hpp"
+#include "engine/Menu/Items/../../window.hpp"
+#include "engine/State/Manager.hpp"
+#include "engine/State/State.hpp"
 
 GameState::GameState(Manager &manager):State(manager),style(nullptr),data(nullptr)
 {

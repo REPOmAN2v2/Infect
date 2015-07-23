@@ -2,7 +2,12 @@
 
 #include <engine/style.hpp>
 #include <engine/window.hpp>
+#include <vector>
+
 #include "GameData.hpp"
+
+class GameData;
+class Window;
 
 class GameStyle : public Style
 {

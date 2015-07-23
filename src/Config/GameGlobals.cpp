@@ -1,6 +1,7 @@
 #include <engine/Config/config.hpp>
+#include <libconfig.h++>
+
 #include "GameGlobals.hpp"
-#include <iostream>
 
 bool GameGlobals::Settings::step = false;
 std::string GameGlobals::Settings::speed = "Normal";

@@ -1,11 +1,14 @@
 #pragma once
 
 #include <engine/Menu/Menu.hpp>
+
 #include "MenuItemTemplates.hpp"
+
+class Manager;
 
 class MainMenu : public Menu {
 public:
-	MainMenu(Manager &manager);
+	explicit MainMenu(Manager &manager);
 	void update() override;
 	void load() override;
 private:

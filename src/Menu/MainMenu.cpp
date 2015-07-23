@@ -1,7 +1,18 @@
+#include <engine/Dialog/Dialog.hpp>
+#include <string>
+
 #include "MainMenu.hpp"
+#include "Menu/MenuItemTemplates.hpp"
 #include "PlayMenu.hpp"
 #include "SettingsMenu.hpp"
-#include <engine/Dialog/Dialog.hpp>
+#include "engine/Menu/../State/Manager.hpp"
+#include "engine/Menu/Items/../../window.hpp"
+#include "engine/Menu/Items/MenuItem.hpp"
+#include "engine/Menu/Menu.hpp"
+#include "engine/Menu/MenuData.hpp"
+#include "engine/Menu/MenuStyle.hpp"
+
+class State;
 
 MainMenu::MainMenu(Manager &manager):Menu(manager) {};
 

@@ -1,8 +1,11 @@
-#include <engine/ncurses.hpp>
-#include <engine/State/Manager.hpp>
 #include <Menu/MainMenu.hpp>
 #include <engine/Config/Globals.hpp>
+#include <engine/State/Manager.hpp>
+#include <engine/ncurses.hpp>
+
 #include "Config/GameGlobals.hpp"
+
+class State;
 
 int main()
 {
