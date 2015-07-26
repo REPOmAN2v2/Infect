@@ -44,15 +44,10 @@ GameStyle::~GameStyle()
 
 void GameStyle::destroy()
 {
-	if (game) {
-		delete game;
-		game = nullptr;
-	}
-
-	if (info) {
-		delete info;
-		info = nullptr;
-	}
+	delete game;
+	delete info;
+	game = nullptr;
+	info = nullptr;
 }
 
 void GameStyle::draw(GameData *data)
@@ -70,7 +65,7 @@ void GameStyle::resize(int h, int w)
 	create();
 }
 
-// TODO: check if that works instead of calling Ncurses functions clear() and refresh() (because it's not anymore)
+// TODO: check if that works instead of calling Ncurses functions clear() and refresh()
 void GameStyle::clearScreen()
 {
 	clear();

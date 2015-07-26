@@ -23,10 +23,8 @@ PlayMenu::PlayMenu(Manager &manager):Menu(manager) {};
 
 void PlayMenu::load()
 {
-	if (data) {
-		delete data;
-		data = nullptr;
-	}
+	delete data;
+	data = nullptr;
 
 	data = new MenuData(style->menu->getH() - 2,
 						style->menu->getW() - 2,
@@ -40,20 +38,27 @@ void PlayMenu::load()
 	item = new MenuItem("Back", ID::BACK, MenuItem::Type::SIMPLE);
 	data->addItem(item);
 	data->addItem(nullptr);
-	item = new MenuItemNumber("Doctors", ID::DOCTORS, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::doctors);
+	item = new MenuItemNumber("Doctors", ID::DOCTORS, MenuItem::Type::NUMBER, 
+		0, 100, GameGlobals::Constants::doctors);
 	data->addItem(item);
-	item = new MenuItemNumber("Infected", ID::INFECTED, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::infected);
+	item = new MenuItemNumber("Infected", ID::INFECTED, MenuItem::Type::NUMBER, 
+		0, 100, GameGlobals::Constants::infected);
 	data->addItem(item);
-	item = new MenuItemNumber("Nurses", ID::NURSES, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::nurses);
+	item = new MenuItemNumber("Nurses", ID::NURSES, MenuItem::Type::NUMBER, 0, 
+		100, GameGlobals::Constants::nurses);
 	data->addItem(item);
-	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, MenuItem::Type::NUMBER, 0, 100, GameGlobals::Constants::soldiers);
+	item = new MenuItemNumber("Soldiers", ID::SOLDIERS, MenuItem::Type::NUMBER, 
+		0, 100, GameGlobals::Constants::soldiers);
 	data->addItem(item);
-	item = new MenuItemNumber("Lumber", ID::LUMBER, MenuItem::Type::NUMBER, 0, 1000, GameGlobals::Constants::lumber);
+	item = new MenuItemNumber("Lumber", ID::LUMBER, MenuItem::Type::NUMBER, 0, 
+		1000, GameGlobals::Constants::lumber);
 	data->addItem(item);
 	data->addItem(nullptr);
-	item = new MenuItemList("Sim speed", ID::SPEED, MenuItem::Type::LIST, simSpeed, GameGlobals::Settings::speed);
+	item = new MenuItemList("Sim speed", ID::SPEED, MenuItem::Type::LIST, 
+		simSpeed, GameGlobals::Settings::speed);
 	data->addItem(item);
-	item = new MenuItemToggle("Step", ID::STEP, MenuItem::Type::TOGGLE, GameGlobals::Settings::step);
+	item = new MenuItemToggle("Step", ID::STEP, MenuItem::Type::TOGGLE, 
+		GameGlobals::Settings::step);
 	data->addItem(item);
 	item = new MenuItem("Reset", ID::RESET, MenuItem::Type::SIMPLE);
 	data->addItem(item);

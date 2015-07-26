@@ -31,7 +31,8 @@ void GameGlobals::load()
 
 static void writeSettingsMenu(Config *cfg)
 {
-	// NOTE: Setting& operator=(const Setting&) is private, so we need a new Setting for each value afaik
+	// NOTE: Setting& operator=(const Setting&) is private, so we need a new 
+	// Setting for each value afaik
 	Setting &root = cfg->getRoot();
 	Setting &settings = IO.addSetting(root, "settings", Setting::TypeGroup);
 	{
