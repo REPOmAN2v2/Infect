@@ -2,9 +2,8 @@
 #include <string>
 
 #include "GameStyle.hpp"
+#include "GameData.hpp"
 #include "engine/window.hpp"
-
-class GameData;
 
 GameStyle::GameStyle(int h, int w):
 	Style(h, w),
@@ -53,7 +52,7 @@ void GameStyle::destroy()
 void GameStyle::draw(GameData *data)
 {
 	clear();
-	//game->draw(stuff)
+	data->draw(game);
 	refresh();
 }
 
